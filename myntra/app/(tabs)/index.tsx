@@ -111,8 +111,8 @@ export default function Home() {
     const fetchproduct = async () => {
       try {
         setIsLoading(true);
-        const cat = await axios.get("https://10.239.54.12/category");
-        const product = await axios.get("https://10.239.54.12/product");
+        const cat = await axios.get("https://myntra-clone-l644.onrender.com/category");
+        const product = await axios.get("https://myntra-clone-l644.onrender.com/product");
         setcategories(cat.data);
         setproduct(product.data);
       } catch (error) {

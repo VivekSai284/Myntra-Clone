@@ -99,7 +99,7 @@ export default function ProductDetails() {
       try {
         setIsLoading(true);
         const product = await axios.get(
-          `https://10.239.54.12/product/${id}`
+          `https://myntra-clone-l644.onrender.com/product/${id}`
         );
         setproduct(product.data);
       } catch (error) {
@@ -150,7 +150,7 @@ export default function ProductDetails() {
     }
 
     try {
-      await axios.post(`https://10.239.54.12/wishlist`, {
+      await axios.post(`https://myntra-clone-l644.onrender.com/wishlist`, {
         userId: user._id,
         productId: id,
       });
@@ -173,7 +173,7 @@ export default function ProductDetails() {
     }
     try {
       setLoading(true);
-      await axios.post(`https://10.239.54.12/bag`, {
+      await axios.post(`https://myntra-clone-l644.onrender.com/bag`, {
         userId: user._id,
         productId: id,
         size: selectedSize,
