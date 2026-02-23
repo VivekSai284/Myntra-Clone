@@ -38,9 +38,13 @@
       "typedRoutes": true
     },
     "extra": {
+      "router": {
+        "origin": false
+      },
       "eas": {
-        "projectId": "f9b38ac7-9f10-4d68-8789-b6b79a4410f5"
+        "projectId": "d83786f2-5418-4730-9579-05ca5ee8591d"
       }
-    }
+    },
+    "owner": "viveksai"
   }
 }

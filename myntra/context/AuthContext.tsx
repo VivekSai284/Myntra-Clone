@@ -31,37 +31,51 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const login = async (email: string, password: string) => {
-    // 👉 Replace with your real API URL
-    const res = await axios.post("https://myntra-clone-l644.onrender.com/user/login", {
-      email,
-      password,
+  const res = await axios.post(
+    "https://myntra-clone-l644.onrender.com/user/login",
+    { email, password }
+  );
+
+  const data = res.data.user;
+
+  console.log("LOGIN RESPONSE:", data); // 🔥 debug
+
+  if (data && data._id) {
+    await saveUserData(data._id, data.fullName, data.email);
+
+    setUser({
+      _id: data._id,
+      name: data.fullName, // ✅ FIXED
+      email: data.email,
     });
 
-    const data = await res.data.user;
-    if (data.fullName) {
-      await saveUserData(data._id, data.fullName, data.email);
-      setUser({ _id: data._id, name: data.name, email: data.email });
-      setIsAuthenticated(true);
-    } else {
-      throw new Error(data.message || "Login failed");
-    }
-  };
+    setIsAuthenticated(true);
+  } else {
+    throw new Error(res.data.message || "Login failed");
+  }
+};
   const Signup = async (fullName: string, email: string, password: string) => {
-    // 👉 Replace with your real API URL
-    const res = await axios.post("https://myntra-clone-l644.onrender.com/user/signup", {
-      fullName,
-      email,
-      password,
+  const res = await axios.post(
+    "https://myntra-clone-l644.onrender.com/user/signup",
+    { fullName, email, password }
+  );
+
+  const data = res.data.user;
+
+  if (data && data._id) {
+    await saveUserData(data._id, data.fullName, data.email);
+
+    setUser({
+      _id: data._id,
+      name: data.fullName, // ✅ FIXED
+      email: data.email,
     });
-    const data = await res.data.user;
-    if (data.fullName) {
-      await saveUserData(data._id, data.fullName, data.email);
-      setUser({ _id: data._id, name: data.name, email: data.email });
-      setIsAuthenticated(true);
-    } else {
-      throw new Error(data.message || "Login failed");
-    }
-  };
+
+    setIsAuthenticated(true);
+  } else {
+    throw new Error(res.data.message || "Signup failed");
+  }
+};
   const logout = async () => {
     await clearUserData();
     setUser(null);
