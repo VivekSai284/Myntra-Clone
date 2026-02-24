@@ -1,7 +1,7 @@
 import { useAuth } from "@/context/AuthContext";
 import axios from "axios";
 import { useRouter } from "expo-router";
-import { CreditCard, MapPin, Truck } from "lucide-react-native";
+import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { useState } from "react";
 import {
@@ -42,7 +42,7 @@ export default function Checkout() {
       <ScrollView style={styles.content}>
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <MapPin size={24} color="#ff3f6c" />
+            <Ionicons name="location-outline" size={24} color="#ff3f6c" />
             <Text style={styles.sectionTitle}>Shipping Address</Text>
           </View>
           <View style={styles.form}>
@@ -90,7 +90,7 @@ export default function Checkout() {
         {/* Payment Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <CreditCard size={24} color="#ff3f6c" />
+            <Ionicons name="card-outline" size={24} color="#ff3f6c" />
             <Text style={styles.sectionTitle}>Payment Method</Text>
           </View>
           <View style={styles.form}>
@@ -116,7 +116,7 @@ export default function Checkout() {
         {/* Order Summary */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Truck size={24} color="#ff3f6c" />
+            <Ionicons name="car-outline" size={24} color="#ff3f6c" />
             <Text style={styles.sectionTitle}>Order Summary</Text>
           </View>
           <View style={styles.summary}>

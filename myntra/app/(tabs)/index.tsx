@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { Search, ChevronRight } from "lucide-react-native";
+import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import axios from "axios";
@@ -129,7 +129,7 @@ export default function Home() {
       <View style={styles.header}>
         <Text style={styles.logo}>MYNTRA</Text>
         <TouchableOpacity style={styles.searchButton}>
-          <Search size={24} color="#3e3e3e" />
+          <Ionicons name="search-outline" size={24} color="#3e3e3e" />
         </TouchableOpacity>
       </View>
 
@@ -145,7 +145,7 @@ export default function Home() {
           <Text style={styles.sectionTitle}>SHOP BY CATEGORY</Text>
           <TouchableOpacity style={styles.viewAll}>
             <Text style={styles.viewAllText}>View All</Text>
-            <ChevronRight size={20} color="#ff3f6c" />
+            <Ionicons name="chevron-forward-outline" size={20} color="#ff3f6c" />
           </TouchableOpacity>
         </View>
         <ScrollView

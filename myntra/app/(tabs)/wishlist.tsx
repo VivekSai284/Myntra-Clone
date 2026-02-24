@@ -1,7 +1,7 @@
 import { useAuth } from "@/context/AuthContext";
 import axios from "axios";
 import { useRouter } from "expo-router";
-import { Heart, Trash2 } from "lucide-react-native";
+import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -73,7 +73,7 @@ export default function Wishlist() {
           <Text style={styles.headerTitle}>Wishlist</Text>
         </View>
         <View style={styles.emptyState}>
-          <Heart size={64} color="#ff3f6c" />
+          <Ionicons name="heart-outline" size={64} color="#ff3f6c" />
           <Text style={styles.emptyTitle}>
             Please login to view your wishlist
           </Text>
@@ -113,7 +113,7 @@ export default function Wishlist() {
               </View>
             </View>
             <TouchableOpacity style={styles.removeButton} onPress={()=>handledelete(item._id)}>
-              <Trash2 size={24} color="#ff3f6c" />
+              <Ionicons name="trash-outline" size={24} color="#ff3f6c" />
             </TouchableOpacity>
           </View>
         ))}

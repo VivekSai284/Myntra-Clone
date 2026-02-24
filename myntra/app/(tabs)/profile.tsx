@@ -6,25 +6,16 @@ import {
   StyleSheet,
 } from "react-native";
 import { useRouter } from "expo-router";
-import {
-  User,
-  Package,
-  Heart,
-  CreditCard,
-  MapPin,
-  Settings,
-  LogOut,
-  ChevronRight,
-} from "lucide-react-native";
+import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { useAuth } from "@/context/AuthContext";
 
 const menuItems = [
-  { icon: Package, label: "Orders", route: "/orders" },
-  { icon: Heart, label: "Wishlist", route: "/wishlist" },
-  { icon: CreditCard, label: "Payment Methods", route: "/payments" },
-  { icon: MapPin, label: "Addresses", route: "/addresses" },
-  { icon: Settings, label: "Settings", route: "/settings" },
+  { icon: "cube-outline", label: "Orders", route: "/orders" },
+  { icon: "heart-outline", label: "Wishlist", route: "/wishlist" },
+  { icon: "card-outline", label: "Payment Methods", route: "/payments" },
+  { icon: "location-outline", label: "Addresses", route: "/addresses" },
+  { icon: "settings-outline", label: "Settings", route: "/settings" },
 ];
 
 export default function Profile() {
@@ -42,7 +33,7 @@ export default function Profile() {
           <Text style={styles.headerTitle}>Profile</Text>
         </View>
         <View style={styles.emptyState}>
-          <User size={64} color="#ff3f6c" />
+          <Ionicons name="person-outline" size={64} color="#ff3f6c" />
           <Text style={styles.emptyTitle}>
             Please login to view your profile
           </Text>
@@ -66,7 +57,7 @@ export default function Profile() {
       <ScrollView style={styles.content}>
         <View style={styles.userInfo}>
           <View style={styles.avatar}>
-            <User size={40} color="#fff" />
+            <Ionicons name="person-outline" size={40} color="#fff" />
           </View>
           <View style={styles.userDetails}>
             <Text style={styles.userName}>{user.name}</Text>
@@ -82,16 +73,16 @@ export default function Profile() {
               onPress={() => router.push(item.route as any)}
             >
               <View style={styles.menuItemLeft}>
-                <item.icon size={24} color="#3e3e3e" />
+                <Ionicons name={item.icon as any} size={24} color="#3e3e3e" />
                 <Text style={styles.menuItemLabel}>{item.label}</Text>
               </View>
-              <ChevronRight size={24} color="#3e3e3e" />
+              <Ionicons name="chevron-forward-outline" size={24} color="#3e3e3e" />
             </TouchableOpacity>
           ))}
         </View>
 
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <LogOut size={24} color="#ff3f6c" />
+          <Ionicons name="chevron-forward-outline" size={24} color="#ff3f6c" />
           <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
       </ScrollView>

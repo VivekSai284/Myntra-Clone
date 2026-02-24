@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { ShoppingBag, Minus, Plus, Trash2 } from "lucide-react-native";
+import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import axios from "axios";
@@ -71,7 +71,7 @@ export default function Bag() {
           <Text style={styles.headerTitle}>Shopping Bag</Text>
         </View>
         <View style={styles.emptyState}>
-          <ShoppingBag size={64} color="#ff3f6c" />
+          <Ionicons name="bag-outline" size={64} color="#ff3f6c" />
           <Text style={styles.emptyTitle}>Please login to view your bag</Text>
           <TouchableOpacity
             style={styles.loginButton}
@@ -124,14 +124,14 @@ export default function Bag() {
 
               <View style={styles.quantityContainer}>
                 <TouchableOpacity style={styles.quantityButton}>
-                  <Minus size={20} color="#3e3e3e" />
+                  < Ionicons name="remove-outline" size={20} color="#3e3e3e" />
                 </TouchableOpacity>
                 <Text style={styles.quantity}>{item.quantity}</Text>
                 <TouchableOpacity style={styles.quantityButton}>
-                  <Plus size={20} color="#3e3e3e" />
+                  <Ionicons name="add-outline" size={20} color="#3e3e3e" />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.removeButton} onPress={()=>handledelete(item._id)}>
-                  <Trash2 size={20} color="#ff3f6c" />
+                  <Ionicons name="trash-outline" size={20} color="#ff3f6c" />
                 </TouchableOpacity>
               </View>
             </View>

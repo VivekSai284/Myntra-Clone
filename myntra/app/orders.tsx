@@ -9,15 +9,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useRouter } from "expo-router";
-import {
-  Package,
-  ChevronRight,
-  MapPin,
-  Truck,
-  Clock,
-  Calendar,
-  CreditCard,
-} from "lucide-react-native";
+import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import axios from "axios";
 import { useAuth } from "@/context/AuthContext";
@@ -191,7 +183,7 @@ export default function Orders() {
                 <Text style={styles.orderDate}>{order.date}</Text>
               </View>
               <View style={styles.statusContainer}>
-                <Package size={16} color="#00b852" />
+                <Ionicons name="cube-outline" size={16} color="#00b852" />
                 <Text style={styles.orderStatus}>{order.status}</Text>
               </View>
             </TouchableOpacity>
@@ -216,7 +208,7 @@ export default function Orders() {
               <View style={styles.orderDetails}>
                 <View style={styles.detailSection}>
                   <View style={styles.detailHeader}>
-                    <MapPin size={20} color="#3e3e3e" />
+                    <Ionicons name="location-outline" size={20} color="#3e3e3e" />
                     <Text style={styles.detailTitle}>Shipping Address</Text>
                   </View>
                   <Text style={styles.detailText}>{order.shippingAddress}</Text>
@@ -224,7 +216,7 @@ export default function Orders() {
 
                 <View style={styles.detailSection}>
                   <View style={styles.detailHeader}>
-                    <CreditCard size={20} color="#3e3e3e" />
+                    <Ionicons name="card-outline" size={20} color="#3e3e3e" />
                     <Text style={styles.detailTitle}>Payment Method</Text>
                   </View>
                   <Text style={styles.detailText}>{order.paymentMethod}</Text>
@@ -232,7 +224,7 @@ export default function Orders() {
 
                 <View style={styles.detailSection}>
                   <View style={styles.detailHeader}>
-                    <Truck size={20} color="#3e3e3e" />
+                    <Ionicons name="car-outline" size={20} color="#3e3e3e" />
                     <Text style={styles.detailTitle}>Tracking Information</Text>
                   </View>
                   <View style={styles.trackingInfo}>
@@ -281,7 +273,7 @@ export default function Orders() {
                 <Text style={styles.detailsButtonText}>
                   {expandedOrder === order._id ? "Hide Details" : "View Details"}
                 </Text>
-                <ChevronRight size={20} color="#ff3f6c" />
+                <Ionicons name="chevron-forward-outline" size={20} color="#ff3f6c" />
               </TouchableOpacity>
             </View>
           </View>

@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Chrome, Heart, Search, ShoppingBag, User } from 'lucide-react-native';
+import { Ionicons } from "@expo/vector-icons";
 export default function TabLayout() {
   return (
     <Tabs
@@ -13,35 +13,35 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color ,size}) => <Chrome size={size} color={color}/>,
+          tabBarIcon: ({ color ,size}) => <Ionicons name="home-outline" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="categories"
         options={{
           title: 'Categories',
-          tabBarIcon: ({ color ,size}) => <Search size={size} color={color}/>,
+          tabBarIcon: ({ color ,size}) => <Ionicons name="search-outline" size={size} color={color} />,
         }}
       />
         <Tabs.Screen
         name="wishlist"
         options={{
           title: 'Wishlist',
-          tabBarIcon: ({ color ,size}) => <Heart size={size} color={color}/>,
+          tabBarIcon: ({ color ,size}) => <Ionicons name="heart-outline" size={size} color={color} />,
         }}
       />
         <Tabs.Screen
         name="bag"
         options={{
           title: 'Bag',
-          tabBarIcon: ({ color ,size}) => <ShoppingBag size={size} color={color}/>,
+          tabBarIcon: ({ color ,size}) => <Ionicons name="bag-outline" size={size} color={color} />,
         }}
       />
         <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ color ,size}) => <User size={size} color={color}/>,
+          tabBarIcon: ({ color ,size}) => <Ionicons name="person-outline" size={size} color={color} />,
         }}
       />
      

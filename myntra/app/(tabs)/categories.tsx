@@ -18,7 +18,7 @@ import { ThemedView } from "@/components/ThemedView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
-import { Search, X } from "lucide-react-native";
+import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 
 // const categories = [
@@ -217,7 +217,7 @@ export default function TabTwoScreen() {
 
       <View style={styles.searchContainer}>
         <View style={styles.searchInputContainer}>
-          <Search size={20} color="#666" style={styles.searchIcon} />
+          <Ionicons name="search-outline" size={20} color="#666" style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
             placeholder="Search for products, brands and more"
@@ -226,7 +226,7 @@ export default function TabTwoScreen() {
           />
           {searchQuery !== "" && (
             <TouchableOpacity onPress={clearSearch}>
-              <X size={20} color="#666" />
+              <Ionicons name="close-outline" size={20} color="#666" />
             </TouchableOpacity>
           )}
         </View>

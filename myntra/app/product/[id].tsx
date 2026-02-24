@@ -10,7 +10,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { Heart, ShoppingBag } from "lucide-react-native";
+import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { useAuth } from "@/context/AuthContext";
 import axios from "axios";
@@ -88,7 +88,7 @@ export default function ProductDetails() {
   const [isLoading, setIsLoading] = useState(true);
   const [loading, setLoading] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
-  const autoScrollTimer = useRef<NodeJS.Timeout>();
+  const autoScrollTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const { user } = useAuth();
   const [product, setproduct] = useState<any>(null);
   const [iswishlist, setiswishlist] = useState(false);
@@ -252,7 +252,7 @@ export default function ProductDetails() {
               style={styles.wishlistButton}
               onPress={handleAddwishlist}
             >
-              <Heart
+              <Ionicons name="heart-outline"
                 size={24}
                 color={iswishlist ? "#ff3f6c" : "#ccc"}
                 fill={iswishlist ? "#ff3f6c" : "none"}
@@ -304,7 +304,7 @@ export default function ProductDetails() {
             <ActivityIndicator size="small" color="#ff3f6c" />
           ) : (
             <>
-              <ShoppingBag size={20} color="#fff" />
+              <Ionicons name="bag-outline" size={20} color="#fff" />
               <Text style={styles.addToBagText}>ADD TO BAG</Text>
             </>
           )}

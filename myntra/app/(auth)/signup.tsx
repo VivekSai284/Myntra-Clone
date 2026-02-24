@@ -10,7 +10,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { Eye, EyeOff } from "lucide-react-native";
+import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { useAuth } from "@/context/AuthContext";
 
@@ -146,9 +146,9 @@ export default function Signup() {
               onPress={() => setShowPassword(!showPassword)}
             >
               {showPassword ? (
-                <EyeOff size={20} color="#666" />
+                <Ionicons name="eye-off-outline" size={20} color="gray" />
               ) : (
-                <Eye size={20} color="#666" />
+                <Ionicons name="eye-outline" size={20} color="gray" />
               )}
             </TouchableOpacity>
           </View>
