@@ -4,7 +4,7 @@
     "slug": "myntra",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/myntra.jpg",
+    "icon": "./assets/images/myntra.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -13,7 +13,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/myntra.jpg",
+        "foregroundImage": "./assets/images/myntra.png",
         "backgroundColor": "#ffffff"
       }
     },
@@ -26,7 +26,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/myntra.jpg",
+          "image": "./assets/images/myntra.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
