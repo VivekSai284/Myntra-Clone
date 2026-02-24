@@ -1,24 +1,50 @@
-import * as SecureStore from "expo-secure-store";
+// storage.ts
 
-export const saveUserData = async (
-  _id: string,
-  name: string,
-  email: string
-) => {
-  await SecureStore.setItemAsync("userid", _id);
-  await SecureStore.setItemAsync("userName", name);
-  await SecureStore.setItemAsync("userEmail", email);
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+// ==========================
+// Save Data
+// ==========================
+export const setItem = async (key: string, value: any) => {
+  try {
+    const jsonValue = JSON.stringify(value);
+    await AsyncStorage.setItem(key, jsonValue);
+  } catch (error) {
+    console.log("Error saving data:", error);
+  }
 };
 
-export const getUserData = async () => {
-  const _id = await SecureStore.getItemAsync("userid");
-  const name = await SecureStore.getItemAsync("userName");
-  const email = await SecureStore.getItemAsync("userEmail");
-  return { _id, name, email };
+// ==========================
+// Get Data
+// ==========================
+export const getItem = async (key: string) => {
+  try {
+    const jsonValue = await AsyncStorage.getItem(key);
+    return jsonValue != null ? JSON.parse(jsonValue) : null;
+  } catch (error) {
+    console.log("Error getting data:", error);
+    return null;
+  }
 };
 
-export const clearUserData = async () => {
-  await SecureStore.deleteItemAsync("userid");
-  await SecureStore.deleteItemAsync("userName");
-  await SecureStore.deleteItemAsync("userEmail");
+// ==========================
+// Remove Data
+// ==========================
+export const removeItem = async (key: string) => {
+  try {
+    await AsyncStorage.removeItem(key);
+  } catch (error) {
+    console.log("Error removing data:", error);
+  }
+};
+
+// ==========================
+// Clear All Storage
+// ==========================
+export const clearStorage = async () => {
+  try {
+    await AsyncStorage.clear();
+  } catch (error) {
+    console.log("Error clearing storage:", error);
+  }
 };
