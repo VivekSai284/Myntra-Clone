@@ -1,50 +1,43 @@
-// storage.ts
-
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+const USER_KEY = "user_data";
+
 // ==========================
-// Save Data
+// Save User
 // ==========================
-export const setItem = async (key: string, value: any) => {
+export const saveUserData = async (
+  id: string,
+  name: string,
+  email: string
+) => {
   try {
-    const jsonValue = JSON.stringify(value);
-    await AsyncStorage.setItem(key, jsonValue);
+    const user = { _id: id, name, email };
+    await AsyncStorage.setItem(USER_KEY, JSON.stringify(user));
   } catch (error) {
-    console.log("Error saving data:", error);
+    console.log("Error saving user:", error);
   }
 };
 
 // ==========================
-// Get Data
+// Get User
 // ==========================
-export const getItem = async (key: string) => {
+export const getUserData = async () => {
   try {
-    const jsonValue = await AsyncStorage.getItem(key);
-    return jsonValue != null ? JSON.parse(jsonValue) : null;
+    const data = await AsyncStorage.getItem(USER_KEY);
+    return data ? JSON.parse(data) : {};
   } catch (error) {
-    console.log("Error getting data:", error);
-    return null;
+    console.log("Error getting user:", error);
+    return {};
   }
 };
 
 // ==========================
-// Remove Data
+// Clear User
 // ==========================
-export const removeItem = async (key: string) => {
+export const clearUserData = async () => {
   try {
-    await AsyncStorage.removeItem(key);
+    await AsyncStorage.removeItem(USER_KEY);
   } catch (error) {
-    console.log("Error removing data:", error);
-  }
-};
-
-// ==========================
-// Clear All Storage
-// ==========================
-export const clearStorage = async () => {
-  try {
-    await AsyncStorage.clear();
-  } catch (error) {
-    console.log("Error clearing storage:", error);
+    console.log("Error clearing user:", error);
   }
 };
