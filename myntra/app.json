@@ -37,14 +37,12 @@
     "experiments": {
       "typedRoutes": true
     },
+    "owner": "viveksai",
     "extra": {
-      "router": {
-        "origin": false
-      },
+      "router": {},
       "eas": {
-        "projectId": "d83786f2-5418-4730-9579-05ca5ee8591d"
+        "projectId": "1bf2b1f5-62f1-4ac4-9dc5-f148b9d8403b"
       }
-    },
-    "owner": "viveksai"
+    }
   }
 }
