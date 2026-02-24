@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const login = async (email: string, password: string) => {
   const res = await axios.post(
-    "https://myntra-clone-l644.onrender.com/user/login",
+    "https://myntra-clone-j4a9.onrender.com/user/login",
     { email, password }
   );
 
@@ -56,7 +56,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 };
   const Signup = async (fullName: string, email: string, password: string) => {
   const res = await axios.post(
-    "https://myntra-clone-l644.onrender.com/user/signup",
+    "https://myntra-clone-j4a9.onrender.com/user/signup",
     { fullName, email, password }
   );
 
