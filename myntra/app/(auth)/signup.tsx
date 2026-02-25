@@ -13,9 +13,11 @@ import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { useAuth } from "@/context/AuthContext";
+import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 
 export default function Signup() {
   const { Signup } = useAuth();
+  const { syncWithServer } = useRecentlyViewed();
   const router = useRouter();
   const [isloading, setisloading] = useState(false);
   const [formData, setFormData] = useState({
@@ -69,6 +71,7 @@ export default function Signup() {
       try {
         setisloading(true);
         await Signup(formData.fullName, formData.email, formData.password);
+        await syncWithServer();
         router.replace("/(tabs)");
       } catch (error) {
         console.error(error);

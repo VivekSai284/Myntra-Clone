@@ -3,12 +3,15 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
+  FlatList,
+  Image,
   StyleSheet,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { useAuth } from "@/context/AuthContext";
+import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 
 const menuItems = [
   { icon: "cube-outline", label: "Orders", route: "/orders" },
@@ -21,8 +24,10 @@ const menuItems = [
 export default function Profile() {
   const router = useRouter();
   const { user, logout } = useAuth();
+  const { recentlyViewed } = useRecentlyViewed();
+
   const handleLogout = () => {
-    logout()
+    logout();
     router.replace("/");
   };
 
@@ -76,9 +81,49 @@ export default function Profile() {
                 <Ionicons name={item.icon as any} size={24} color="#3e3e3e" />
                 <Text style={styles.menuItemLabel}>{item.label}</Text>
               </View>
-              <Ionicons name="chevron-forward-outline" size={24} color="#3e3e3e" />
+              <Ionicons
+                name="chevron-forward-outline"
+                size={24}
+                color="#3e3e3e"
+              />
             </TouchableOpacity>
           ))}
+        </View>
+        {/* ✅ Recently Viewed Section */}
+        <View style={{ marginTop: 25, paddingHorizontal: 15 }}>
+          <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}>
+            Recently Viewed
+          </Text>
+
+          {recentlyViewed.length === 0 ? (
+            <Text style={{ color: "#666" }}>No recently viewed products</Text>
+          ) : (
+            <FlatList
+              data={recentlyViewed}
+              keyExtractor={(item) => item._id}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              renderItem={({ item }) => (
+                <TouchableOpacity style={{ marginRight: 12 }}>
+                  <Image
+                    source={{ uri: item.images?.[0] }}
+                    style={{
+                      width: 90,
+                      height: 90,
+                      borderRadius: 10,
+                      backgroundColor: "#f5f5f5",
+                    }}
+                  />
+                  <Text
+                    numberOfLines={1}
+                    style={{ width: 90, marginTop: 5, fontSize: 12 }}
+                  >
+                    {item.name}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            />
+          )}
         </View>
 
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>

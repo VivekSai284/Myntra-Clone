@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { getUserData, saveUserData, clearUserData } from "@/utils/storage";
+import { syncRecentlyViewed } from "@/hooks/useRecentlyViewedSync";
 import React from "react";
 import axios from "axios";
 type AuthContextType = {
@@ -50,6 +51,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     setIsAuthenticated(true);
+    await syncRecentlyViewed(data._id);
   } else {
     throw new Error(res.data.message || "Login failed");
   }
@@ -72,6 +74,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     setIsAuthenticated(true);
+    await syncRecentlyViewed(data._id);
   } else {
     throw new Error(res.data.message || "Signup failed");
   }

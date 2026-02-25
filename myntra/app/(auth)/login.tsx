@@ -12,9 +12,11 @@ import { useRouter } from "expo-router";
 import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@/context/AuthContext";
+import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 
 export default function Login() {
   const { login } = useAuth();
+  const { syncWithServer } = useRecentlyViewed();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
@@ -24,6 +26,7 @@ export default function Login() {
     try {
       setisloading(true);
       await login(email, password);
+      await syncWithServer();
       router.replace("/(tabs)");
     } catch (error) {
       console.error(error);

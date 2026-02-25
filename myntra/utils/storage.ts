@@ -41,3 +41,41 @@ export const clearUserData = async () => {
     console.log("Error clearing user:", error);
   }
 };
+
+
+const KEY = "recently_viewed";
+const MAX = 20;
+
+export const addRecentlyViewedLocal = async (product: any) => {
+  try {
+    const data = await AsyncStorage.getItem(KEY);
+    let list = data ? JSON.parse(data) : [];
+
+    // remove duplicate
+    list = list.filter((item: any) => item.id !== product._id);
+
+    // add newest
+    list.unshift({
+      ...product,
+      viewedAt: Date.now(),
+    });
+
+    // limit 20
+    list = list.slice(0, MAX);
+
+    await AsyncStorage.setItem(KEY, JSON.stringify(list));
+    return list;
+  } catch (e) {
+    console.log("Local recently viewed error", e);
+    return [];
+  }
+};
+
+export const getRecentlyViewedLocal = async () => {
+  const data = await AsyncStorage.getItem(KEY);
+  return data ? JSON.parse(data) : [];
+};
+
+export const setRecentlyViewedLocal = async (list: any[]) => {
+  await AsyncStorage.setItem(KEY, JSON.stringify(list));
+};

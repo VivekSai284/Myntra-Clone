@@ -13,6 +13,8 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { useAuth } from "@/context/AuthContext";
+import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
+
 import axios from "axios";
 
 // Mock product data - in a real app, this would come from an API
@@ -92,28 +94,28 @@ export default function ProductDetails() {
   const { user } = useAuth();
   const [product, setproduct] = useState<any>(null);
   const [iswishlist, setiswishlist] = useState(false);
+  const { addRecentlyViewed } = useRecentlyViewed();
+  // ✅ FETCH PRODUCT
   useEffect(() => {
-    // Simulate loading time
-
     const fetchproduct = async () => {
       try {
         setIsLoading(true);
-        const product = await axios.get(
-          `https://myntra-clone-j4a9.onrender.com/product/${id}`
+        const res = await axios.get(
+          `https://myntra-clone-j4a9.onrender.com/product/${id}`,
         );
-        setproduct(product.data);
+        setproduct(res.data);
       } catch (error) {
         console.log(error);
-        setIsLoading(false);
       } finally {
         setIsLoading(false);
       }
     };
-    fetchproduct();
-  }, []);
 
+    fetchproduct();
+  }, [id]);
+
+  // ✅ AUTO SCROLL
   useEffect(() => {
-    // Start auto-scroll
     startAutoScroll();
 
     return () => {
@@ -121,11 +123,18 @@ export default function ProductDetails() {
         clearInterval(autoScrollTimer.current);
       }
     };
-  }, []);
+  }, [product, currentImageIndex]);
+
+  useEffect(() => {
+    if (!product?._id) return;
+    addRecentlyViewed(product);
+  }, [product?._id]);
 
   const startAutoScroll = () => {
+    if (!product?.images?.length) return;
+
     autoScrollTimer.current = setInterval(() => {
-      if (product && scrollViewRef.current) {
+      if (scrollViewRef.current) {
         const nextIndex = (currentImageIndex + 1) % product.images.length;
         scrollViewRef.current.scrollTo({
           x: nextIndex * width,
@@ -136,6 +145,16 @@ export default function ProductDetails() {
     }, 3000);
   };
 
+  // ✅ LOADING UI
+  if (isLoading) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#ff3f6c" />
+      </View>
+    );
+  }
+
+  // ✅ PRODUCT NOT FOUND
   if (!product) {
     return (
       <View style={styles.container}>
@@ -143,6 +162,8 @@ export default function ProductDetails() {
       </View>
     );
   }
+
+  // ✅ WISHLIST
   const handleAddwishlist = async () => {
     if (!user) {
       router.push("/login");
@@ -160,6 +181,8 @@ export default function ProductDetails() {
       console.log(error);
     }
   };
+
+  // ✅ ADD TO BAG
   const handleAddToBag = async () => {
     if (!user) {
       router.push("/login");
@@ -167,10 +190,10 @@ export default function ProductDetails() {
     }
 
     if (!selectedSize) {
-      // In a real app, show a proper error message
       alert("Please select a size");
       return;
     }
+
     try {
       setLoading(true);
       await axios.post(`https://myntra-clone-j4a9.onrender.com/bag`, {
@@ -185,7 +208,6 @@ export default function ProductDetails() {
     } finally {
       setLoading(false);
     }
-    // In a real app, this would add the item to the cart in your state management solution
   };
 
   const handleScroll = (event: any) => {
@@ -193,20 +215,11 @@ export default function ProductDetails() {
     const imageIndex = Math.round(contentOffset.x / width);
     setCurrentImageIndex(imageIndex);
 
-    // Reset auto-scroll timer when user manually scrolls
     if (autoScrollTimer.current) {
       clearInterval(autoScrollTimer.current);
       startAutoScroll();
     }
   };
-
-  if (isLoading) {
-    return (
-      <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color="#ff3f6c" />
-      </View>
-    );
-  }
 
   return (
     <View style={styles.container}>
@@ -252,7 +265,8 @@ export default function ProductDetails() {
               style={styles.wishlistButton}
               onPress={handleAddwishlist}
             >
-              <Ionicons name="heart-outline"
+              <Ionicons
+                name="heart-outline"
                 size={24}
                 color={iswishlist ? "#ff3f6c" : "#ccc"}
                 fill={iswishlist ? "#ff3f6c" : "none"}
