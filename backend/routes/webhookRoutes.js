@@ -5,11 +5,18 @@ const AuditLog = require("../models/AuditLog");
 
 router.post("/payment", async (req, res) => {
   try {
-    const event = req.body || {};
+    const event = req.body;
 
-    if (!event.id) {
+    console.log("BODY RECEIVED:", event);
+
+    // ✅ Validate payload
+    if (!event || !event.id || !event.payment_id) {
       return res.status(400).json({ error: "Invalid webhook payload" });
     }
+
+    // ✅ Extract safely
+    const eventId = event.id;
+    const paymentId = event.payment_id;
 
     // 🛑 IDEMPOTENCY CHECK
     const existing = await Transaction.findOne({
@@ -31,21 +38,21 @@ router.post("/payment", async (req, res) => {
         status: event.status,
         webhookEventId: eventId,
       },
-      { upsert: true, new: true, setDefaultsOnInsert: true }
+      { upsert: true, new: true }
     );
 
     // ✅ AUDIT LOG
     await AuditLog.create({
       userId: event.userId,
       transactionId: tx._id,
-      action: event.status || "created",
+      action: event.status,
       metadata: event,
     });
 
     res.json({ success: true });
   } catch (err) {
-    console.error("❌ Webhook error:", err);
-    res.status(500).json({ error: err.message });
+    console.log("WEBHOOK ERROR:", err);
+    res.status(500).json({ error: "Webhook failed" });
   }
 });
 
