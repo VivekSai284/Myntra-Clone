@@ -51,9 +51,9 @@ router.post("/payment", async (req, res) => {
 
     res.json({ success: true });
   } catch (err) {
-    console.log("WEBHOOK ERROR:", err);
-    res.status(500).json({ error: "Webhook failed" });
-  }
+  console.error("🔥 FULL WEBHOOK ERROR:", err);
+  res.status(500).json({ error: err.message });
+}
 });
 
 module.exports = router;
