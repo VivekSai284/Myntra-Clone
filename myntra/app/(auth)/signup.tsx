@@ -14,10 +14,13 @@ import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
+import { useTheme } from "@/hooks/useTheme";
 
 export default function Signup() {
   const { Signup } = useAuth();
   const { syncWithServer } = useRecentlyViewed();
+  const { theme } = useTheme();
+  const styles = createStyles(theme);
   const router = useRouter();
   const [isloading, setisloading] = useState(false);
   const [formData, setFormData] = useState({
@@ -34,17 +37,12 @@ export default function Signup() {
 
   const validateForm = () => {
     let isValid = true;
-    const newErrors = {
-      fullName: "",
-      email: "",
-      password: "",
-    };
+    const newErrors = { fullName: "", email: "", password: "" };
 
     if (!formData.fullName.trim()) {
       newErrors.fullName = "Full name is required";
       isValid = false;
     }
-
     if (!formData.email.trim()) {
       newErrors.email = "Email is required";
       isValid = false;
@@ -52,7 +50,6 @@ export default function Signup() {
       newErrors.email = "Please enter a valid email";
       isValid = false;
     }
-
     if (!formData.password) {
       newErrors.password = "Password is required";
       isValid = false;
@@ -67,7 +64,6 @@ export default function Signup() {
 
   const handleSignup = async () => {
     if (validateForm()) {
-      // Here you would typically make an API call to register the user
       try {
         setisloading(true);
         await Signup(formData.fullName, formData.email, formData.password);
@@ -78,7 +74,6 @@ export default function Signup() {
       } finally {
         setisloading(false);
       }
-      router.replace("/(tabs)");
     }
   };
 
@@ -104,10 +99,9 @@ export default function Signup() {
           <TextInput
             style={[styles.input, errors.fullName && styles.inputError]}
             placeholder="Full Name"
+            placeholderTextColor={theme.colors.subText}
             value={formData.fullName}
-            onChangeText={(text) =>
-              setFormData({ ...formData, fullName: text })
-            }
+            onChangeText={(text) => setFormData({ ...formData, fullName: text })}
           />
           {errors.fullName ? (
             <Text style={styles.errorText}>{errors.fullName}</Text>
@@ -118,6 +112,7 @@ export default function Signup() {
           <TextInput
             style={[styles.input, errors.email && styles.inputError]}
             placeholder="Email"
+            placeholderTextColor={theme.colors.subText}
             value={formData.email}
             onChangeText={(text) => setFormData({ ...formData, email: text })}
             keyboardType="email-address"
@@ -129,36 +124,31 @@ export default function Signup() {
         </View>
 
         <View style={styles.inputGroup}>
-          <View
-            style={[
-              styles.passwordContainer,
-              errors.password && styles.inputError,
-            ]}
-          >
+          <View style={[styles.passwordContainer, errors.password && styles.inputError]}>
             <TextInput
               style={styles.passwordInput}
               placeholder="Password"
+              placeholderTextColor={theme.colors.subText}
               value={formData.password}
-              onChangeText={(text) =>
-                setFormData({ ...formData, password: text })
-              }
+              onChangeText={(text) => setFormData({ ...formData, password: text })}
               secureTextEntry={!showPassword}
             />
             <TouchableOpacity
               style={styles.eyeIcon}
               onPress={() => setShowPassword(!showPassword)}
             >
-              {showPassword ? (
-                <Ionicons name="eye-off-outline" size={20} color="gray" />
-              ) : (
-                <Ionicons name="eye-outline" size={20} color="gray" />
-              )}
+              <Ionicons 
+                name={showPassword ? "eye-off-outline" : "eye-outline"} 
+                size={20} 
+                color={theme.colors.subText} 
+              />
             </TouchableOpacity>
           </View>
           {errors.password ? (
             <Text style={styles.errorText}>{errors.password}</Text>
           ) : null}
         </View>
+
         <TouchableOpacity
           style={styles.button}
           onPress={handleSignup}
@@ -182,90 +172,97 @@ export default function Signup() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  scrollContent: {
-    flexGrow: 1,
-  },
-  backgroundImage: {
-    width: "100%",
-    height: 300,
-    position: "absolute",
-    top: 0,
-  },
-  formContainer: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: "rgba(255, 255, 255, 0.9)",
-    marginTop: 250,
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    marginBottom: 10,
-    color: "#3e3e3e",
-  },
-  subtitle: {
-    fontSize: 16,
-    color: "#666",
-    marginBottom: 30,
-  },
-  inputGroup: {
-    marginBottom: 15,
-  },
-  input: {
-    backgroundColor: "#f5f5f5",
-    padding: 15,
-    borderRadius: 10,
-    fontSize: 16,
-  },
-  inputError: {
-    borderWidth: 1,
-    borderColor: "#ff3f6c",
-  },
-  errorText: {
-    color: "#ff3f6c",
-    fontSize: 12,
-    marginTop: 5,
-    marginLeft: 5,
-  },
-  passwordContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#f5f5f5",
-    borderRadius: 10,
-  },
-  passwordInput: {
-    flex: 1,
-    padding: 15,
-    fontSize: 16,
-  },
-  eyeIcon: {
-    padding: 15,
-  },
-  button: {
-    backgroundColor: "#ff3f6c",
-    padding: 15,
-    borderRadius: 10,
-    alignItems: "center",
-    marginTop: 20,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  loginLink: {
-    marginTop: 20,
-    alignItems: "center",
-  },
-  loginText: {
-    color: "#ff3f6c",
-    fontSize: 16,
-  },
-});
+const createStyles = (theme: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    scrollContent: {
+      flexGrow: 1,
+    },
+    backgroundImage: {
+      width: "100%",
+      height: 300,
+      position: "absolute",
+      top: 0,
+    },
+    formContainer: {
+      flex: 1,
+      padding: 20,
+      backgroundColor: theme.colors.opacity,
+      marginTop: 250,
+      borderTopLeftRadius: 30,
+      borderTopRightRadius: 30,
+    },
+    title: {
+      fontSize: 28,
+      fontWeight: "bold",
+      marginBottom: 10,
+      color: theme.colors.text,
+    },
+    subtitle: {
+      fontSize: 16,
+      color: theme.colors.subText,
+      marginBottom: 30,
+    },
+    inputGroup: {
+      marginBottom: 15,
+    },
+    input: {
+      backgroundColor: theme.colors.card,
+      color: theme.colors.text,
+      padding: 15,
+      borderRadius: 10,
+      fontSize: 16,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    inputError: {
+      borderWidth: 1,
+      borderColor: theme.colors.primary,
+    },
+    errorText: {
+      color: theme.colors.primary,
+      fontSize: 12,
+      marginTop: 5,
+      marginLeft: 5,
+    },
+    passwordContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: theme.colors.card,
+      borderRadius: 10,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    passwordInput: {
+      flex: 1,
+      padding: 15,
+      fontSize: 16,
+      color: theme.colors.text,
+    },
+    eyeIcon: {
+      padding: 15,
+    },
+    button: {
+      backgroundColor: theme.colors.primary,
+      padding: 15,
+      borderRadius: 10,
+      alignItems: "center",
+      marginTop: 20,
+    },
+    buttonText: {
+      color: "#fff",
+      fontSize: 16,
+      fontWeight: "bold",
+    },
+    loginLink: {
+      marginTop: 20,
+      alignItems: "center",
+    },
+    loginText: {
+      color: theme.colors.primary,
+      fontSize: 16,
+    },
+  });

@@ -14,72 +14,9 @@ import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
+import { useTheme } from "@/hooks/useTheme";
 
 import axios from "axios";
-
-// Mock product data - in a real app, this would come from an API
-// const products = {
-//   "1": {
-//     id: 1,
-//     name: "Casual White T-Shirt",
-//     brand: "Roadster",
-//     price: 499,
-//     discount: "60% OFF",
-//     description:
-//       "Classic white t-shirt made from premium cotton. Perfect for everyday wear with a comfortable regular fit.",
-//     sizes: ["S", "M", "L", "XL"],
-//     images: [
-//       "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&auto=format&fit=crop",
-//       "https://images.unsplash.com/photo-1562157873-818bc0726f68?w=500&auto=format&fit=crop",
-//       "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=500&auto=format&fit=crop",
-//     ],
-//   },
-//   "2": {
-//     id: 2,
-//     name: "Denim Jacket",
-//     brand: "Levis",
-//     price: 2499,
-//     discount: "40% OFF",
-//     description:
-//       "Classic denim jacket with a modern twist. Features premium quality denim and comfortable fit.",
-//     sizes: ["S", "M", "L", "XL"],
-//     images: [
-//       "https://images.unsplash.com/photo-1523205771623-e0faa4d2813d?w=500&auto=format&fit=crop",
-//       "https://images.unsplash.com/photo-1542272604-787c3835535d?w=500&auto=format&fit=crop",
-//       "https://images.unsplash.com/photo-1601933973783-43cf8a7d4c5f?w=500&auto=format&fit=crop",
-//     ],
-//   },
-//   "3": {
-//     id: 3,
-//     name: "Summer Dress",
-//     brand: "ONLY",
-//     price: 1299,
-//     discount: "50% OFF",
-//     description:
-//       "Flowy summer dress perfect for warm weather. Made from lightweight fabric with a flattering cut.",
-//     sizes: ["XS", "S", "M", "L"],
-//     images: [
-//       "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=500&auto=format&fit=crop",
-//       "https://images.unsplash.com/photo-1623609163859-ca93c959b98a?w=500&auto=format&fit=crop",
-//       "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=500&auto=format&fit=crop",
-//     ],
-//   },
-//   "4": {
-//     id: 4,
-//     name: "Classic Sneakers",
-//     brand: "Nike",
-//     price: 3499,
-//     discount: "30% OFF",
-//     description:
-//       "Versatile sneakers that combine style and comfort. Perfect for both casual wear and light exercise.",
-//     sizes: ["UK6", "UK7", "UK8", "UK9", "UK10"],
-//     images: [
-//       "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&auto=format&fit=crop",
-//       "https://images.unsplash.com/photo-1607522370275-f14206abe5d3?w=500&auto=format&fit=crop",
-//       "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=500&auto=format&fit=crop",
-//     ],
-//   },
-// };
 
 export default function ProductDetails() {
   const { id } = useLocalSearchParams();
@@ -95,6 +32,9 @@ export default function ProductDetails() {
   const [product, setproduct] = useState<any>(null);
   const [iswishlist, setiswishlist] = useState(false);
   const { addRecentlyViewed } = useRecentlyViewed();
+  const { theme } = useTheme();
+  const styles = createStyles(theme);
+
   // ✅ FETCH PRODUCT
   useEffect(() => {
     const fetchproduct = async () => {
@@ -149,7 +89,7 @@ export default function ProductDetails() {
   if (isLoading) {
     return (
       <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color="#ff3f6c" />
+        <ActivityIndicator size="large" color={theme.colors.primary} />
       </View>
     );
   }
@@ -158,7 +98,7 @@ export default function ProductDetails() {
   if (!product) {
     return (
       <View style={styles.container}>
-        <Text>Product not found</Text>
+        <Text style={{ color: theme.colors.text }}>Product not found</Text>
       </View>
     );
   }
@@ -266,10 +206,9 @@ export default function ProductDetails() {
               onPress={handleAddwishlist}
             >
               <Ionicons
-                name="heart-outline"
+                name={iswishlist ? "heart" : "heart-outline"}
                 size={24}
-                color={iswishlist ? "#ff3f6c" : "#ccc"}
-                fill={iswishlist ? "#ff3f6c" : "none"}
+                color={iswishlist ? theme.colors.primary : theme.colors.subText}
               />
             </TouchableOpacity>
           </View>
@@ -315,7 +254,7 @@ export default function ProductDetails() {
           disabled={loading}
         >
           {loading ? (
-            <ActivityIndicator size="small" color="#ff3f6c" />
+            <ActivityIndicator size="small" color="#fff" />
           ) : (
             <>
               <Ionicons name="bag-outline" size={20} color="#fff" />
@@ -328,16 +267,17 @@ export default function ProductDetails() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: any) =>
+  StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: theme.colors.background,
   },
   loaderContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#fff",
+    backgroundColor: theme.colors.background,
   },
   carouselContainer: {
     position: "relative",
@@ -376,13 +316,13 @@ const styles = StyleSheet.create({
   },
   brand: {
     fontSize: 16,
-    color: "#666",
+    color: theme.colors.subText,
     marginBottom: 5,
   },
   name: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#3e3e3e",
+    color: theme.colors.text,
     marginBottom: 10,
   },
   wishlistButton: {
@@ -396,16 +336,16 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#3e3e3e",
+    color: theme.colors.text,
     marginRight: 10,
   },
   discount: {
     fontSize: 16,
-    color: "#ff3f6c",
+    color: theme.colors.primary,
   },
   description: {
     fontSize: 16,
-    color: "#666",
+    color: theme.colors.subText,
     lineHeight: 24,
     marginBottom: 20,
   },
@@ -415,7 +355,7 @@ const styles = StyleSheet.create({
   sizeTitle: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#3e3e3e",
+    color: theme.colors.text,
     marginBottom: 10,
   },
   sizeGrid: {
@@ -428,29 +368,30 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 30,
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: theme.colors.border,
     justifyContent: "center",
     alignItems: "center",
   },
   selectedSize: {
-    borderColor: "#ff3f6c",
-    backgroundColor: "#fff4f4",
+    borderColor: theme.colors.primary,
+    backgroundColor: theme.colors.card,
   },
   sizeText: {
     fontSize: 16,
-    color: "#3e3e3e",
+    color: theme.colors.text,
   },
   selectedSizeText: {
-    color: "#ff3f6c",
+    color: theme.colors.primary,
+    fontWeight: "bold",
   },
   footer: {
     padding: 15,
-    backgroundColor: "#fff",
+    backgroundColor: theme.colors.background,
     borderTopWidth: 1,
-    borderTopColor: "#f0f0f0",
+    borderTopColor: theme.colors.border,
   },
   addToBagButton: {
-    backgroundColor: "#ff3f6c",
+    backgroundColor: theme.colors.primary,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",

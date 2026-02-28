@@ -13,123 +13,18 @@ import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import axios from "axios";
 import { useAuth } from "@/context/AuthContext";
-
-const orders = [
-  {
-    id: "ORD123456",
-    date: "15 Mar 2024",
-    status: "Delivered",
-    items: [
-      {
-        id: 1,
-        name: "White Cotton T-Shirt",
-        brand: "H&M",
-        size: "L",
-        price: 799,
-        image:
-          "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&auto=format&fit=crop",
-      },
-      {
-        id: 2,
-        name: "Blue Denim Jacket",
-        brand: "Levis",
-        size: "M",
-        price: 2999,
-        image:
-          "https://images.unsplash.com/photo-1523205771623-e0faa4d2813d?w=500&auto=format&fit=crop",
-      },
-    ],
-    total: 4087,
-    shippingAddress: "123 Main Street, Apt 4B, New York, NY 10001",
-    paymentMethod: "Credit Card ending in 4242",
-    tracking: {
-      number: "TRK789012345",
-      carrier: "FedEx",
-      estimatedDelivery: "15 Mar 2024",
-      currentLocation: "New York City Hub",
-      status: "Delivered",
-      timeline: [
-        {
-          status: "Delivered",
-          location: "New York, NY",
-          timestamp: "15 Mar 2024, 14:30",
-        },
-        {
-          status: "Out for Delivery",
-          location: "New York City Hub",
-          timestamp: "15 Mar 2024, 09:15",
-        },
-        {
-          status: "Arrived at Delivery Facility",
-          location: "New York Distribution Center",
-          timestamp: "14 Mar 2024, 23:45",
-        },
-        {
-          status: "Order Shipped",
-          location: "New Jersey Warehouse",
-          timestamp: "13 Mar 2024, 16:20",
-        },
-        {
-          status: "Order Confirmed",
-          location: "Online",
-          timestamp: "12 Mar 2024, 10:00",
-        },
-      ],
-    },
-  },
-  {
-    id: "ORD123457",
-    date: "10 Mar 2024",
-    status: "Delivered",
-    items: [
-      {
-        id: 3,
-        name: "Summer Dress",
-        brand: "ONLY",
-        size: "S",
-        price: 1299,
-        image:
-          "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=500&auto=format&fit=crop",
-      },
-    ],
-    total: 1398,
-    shippingAddress: "123 Main Street, Apt 4B, New York, NY 10001",
-    paymentMethod: "Credit Card ending in 4242",
-    tracking: {
-      number: "TRK789012346",
-      carrier: "UPS",
-      estimatedDelivery: "10 Mar 2024",
-      currentLocation: "Delivered",
-      status: "Delivered",
-      timeline: [
-        {
-          status: "Delivered",
-          location: "New York, NY",
-          timestamp: "10 Mar 2024, 15:45",
-        },
-        {
-          status: "Order Shipped",
-          location: "New Jersey Warehouse",
-          timestamp: "08 Mar 2024, 11:30",
-        },
-        {
-          status: "Order Confirmed",
-          location: "Online",
-          timestamp: "07 Mar 2024, 09:15",
-        },
-      ],
-    },
-  },
-];
+import { useTheme } from "@/hooks/useTheme";
 
 export default function Orders() {
   const router = useRouter();
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
+  const { theme } = useTheme();
+  const styles = createStyles(theme);
   const [orders, setorder] = useState<any>(null);
+
   useEffect(() => {
-    // Simulate loading time
     const fetchorder = async () => {
       if (user) {
         try {
@@ -147,24 +42,33 @@ export default function Orders() {
       }
     };
     fetchorder();
-  }, []);
-   if (isLoading) {
-      return (
-        <View style={styles.loaderContainer}>
-          <ActivityIndicator size="large" color="#ff3f6c" />
-        </View>
-      );
-    }
-  const toggleOrderDetails = (orderId: string) => {
-    setExpandedOrder(expandedOrder === orderId ? null : orderId);
-  };
-  if (!orders) {
+  }, [user]);
+
+  if (isLoading) {
     return (
-      <View style={styles.container}>
-        <Text>Order not found</Text>
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
       </View>
     );
   }
+
+  const toggleOrderDetails = (orderId: string) => {
+    setExpandedOrder(expandedOrder === orderId ? null : orderId);
+  };
+
+  if (!orders || orders.length === 0) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.header}>
+           <Text style={styles.headerTitle}>My Orders</Text>
+        </View>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <Text style={{ color: theme.colors.subText }}>No orders found</Text>
+        </View>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -172,27 +76,27 @@ export default function Orders() {
       </View>
 
       <ScrollView style={styles.content}>
-        {orders.map((order:any) => (
+        {orders.map((order: any) => (
           <View key={order._id} style={styles.orderCard}>
             <TouchableOpacity
               style={styles.orderHeader}
               onPress={() => toggleOrderDetails(order._id)}
             >
               <View>
-                <Text style={styles.orderId}>Order #{order._id}</Text>
+                <Text style={styles.orderId}>Order #{order._id.slice(-8)}</Text>
                 <Text style={styles.orderDate}>{order.date}</Text>
               </View>
               <View style={styles.statusContainer}>
-                <Ionicons name="cube-outline" size={16} color="#00b852" />
+                <Ionicons name="cube-outline" size={16} color={theme.colors.success} />
                 <Text style={styles.orderStatus}>{order.status}</Text>
               </View>
             </TouchableOpacity>
 
             <View style={styles.itemsContainer}>
-              {order.items.map((item:any) => (
+              {order.items.map((item: any) => (
                 <View key={item._id} style={styles.orderItem}>
                   <Image
-                    source={{ uri: item.productId.images }}
+                    source={{ uri: item.productId.images[0] }}
                     style={styles.itemImage}
                   />
                   <View style={styles.itemInfo}>
@@ -208,7 +112,7 @@ export default function Orders() {
               <View style={styles.orderDetails}>
                 <View style={styles.detailSection}>
                   <View style={styles.detailHeader}>
-                    <Ionicons name="location-outline" size={20} color="#3e3e3e" />
+                    <Ionicons name="location-outline" size={20} color={theme.colors.text} />
                     <Text style={styles.detailTitle}>Shipping Address</Text>
                   </View>
                   <Text style={styles.detailText}>{order.shippingAddress}</Text>
@@ -216,48 +120,44 @@ export default function Orders() {
 
                 <View style={styles.detailSection}>
                   <View style={styles.detailHeader}>
-                    <Ionicons name="card-outline" size={20} color="#3e3e3e" />
+                    <Ionicons name="card-outline" size={20} color={theme.colors.text} />
                     <Text style={styles.detailTitle}>Payment Method</Text>
                   </View>
                   <Text style={styles.detailText}>{order.paymentMethod}</Text>
                 </View>
 
-                <View style={styles.detailSection}>
-                  <View style={styles.detailHeader}>
-                    <Ionicons name="car-outline" size={20} color="#3e3e3e" />
-                    <Text style={styles.detailTitle}>Tracking Information</Text>
-                  </View>
-                  <View style={styles.trackingInfo}>
-                    <Text style={styles.trackingNumber}>
-                      Tracking Number: {order.tracking.number}
-                    </Text>
-                    <Text style={styles.trackingCarrier}>
-                      Carrier: {order.tracking.carrier}
-                    </Text>
-                  </View>
+                {order.tracking && (
+                  <View style={styles.detailSection}>
+                    <View style={styles.detailHeader}>
+                      <Ionicons name="car-outline" size={20} color={theme.colors.text} />
+                      <Text style={styles.detailTitle}>Tracking Information</Text>
+                    </View>
+                    <View style={styles.trackingInfo}>
+                      <Text style={styles.trackingNumber}>
+                        Tracking Number: {order.tracking.number}
+                      </Text>
+                      <Text style={styles.trackingCarrier}>
+                        Carrier: {order.tracking.carrier}
+                      </Text>
+                    </View>
 
-                  <View style={styles.timeline}>
-                    {order.tracking.timeline.map((event:any, index:any) => (
-                      <View key={index} style={styles.timelineEvent}>
-                        <View style={styles.timelinePoint} />
-                        <View style={styles.timelineContent}>
-                          <Text style={styles.timelineStatus}>
-                            {event.status}
-                          </Text>
-                          <Text style={styles.timelineLocation}>
-                            {event.location}
-                          </Text>
-                          <Text style={styles.timelineTimestamp}>
-                            {event.timestamp}
-                          </Text>
+                    <View style={styles.timeline}>
+                      {order.tracking.timeline.map((event: any, index: any) => (
+                        <View key={index} style={styles.timelineEvent}>
+                          <View style={styles.timelinePoint} />
+                          <View style={styles.timelineContent}>
+                            <Text style={styles.timelineStatus}>{event.status}</Text>
+                            <Text style={styles.timelineLocation}>{event.location}</Text>
+                            <Text style={styles.timelineTimestamp}>{event.timestamp}</Text>
+                          </View>
+                          {index !== order.tracking.timeline.length - 1 && (
+                            <View style={styles.timelineLine} />
+                          )}
                         </View>
-                        {index !== order.tracking.timeline.length - 1 && (
-                          <View style={styles.timelineLine} />
-                        )}
-                      </View>
-                    ))}
+                      ))}
+                    </View>
                   </View>
-                </View>
+                )}
               </View>
             )}
 
@@ -273,7 +173,7 @@ export default function Orders() {
                 <Text style={styles.detailsButtonText}>
                   {expandedOrder === order._id ? "Hide Details" : "View Details"}
                 </Text>
-                <Ionicons name="chevron-forward-outline" size={20} color="#ff3f6c" />
+                <Ionicons name="chevron-forward-outline" size={20} color={theme.colors.primary} />
               </TouchableOpacity>
             </View>
           </View>
@@ -283,46 +183,46 @@ export default function Orders() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: any) =>
+  StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: theme.colors.background,
   },
   loaderContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#fff",
+    backgroundColor: theme.colors.background,
   },
   header: {
     padding: 15,
     paddingTop: 50,
-    backgroundColor: "#fff",
+    backgroundColor: theme.colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
+    borderBottomColor: theme.colors.border,
   },
   headerTitle: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#3e3e3e",
+    color: theme.colors.text,
   },
   content: {
     flex: 1,
     padding: 15,
   },
   orderCard: {
-    backgroundColor: "#fff",
+    backgroundColor: theme.colors.card,
     borderRadius: 10,
     marginBottom: 15,
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 3.84,
     elevation: 5,
     overflow: "hidden",
+    borderWidth: 1,
+    borderColor: theme.colors.border,
   },
   orderHeader: {
     flexDirection: "row",
@@ -330,30 +230,31 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 15,
     borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
+    borderBottomColor: theme.colors.border,
   },
   orderId: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#3e3e3e",
+    color: theme.colors.text,
   },
   orderDate: {
     fontSize: 14,
-    color: "#666",
+    color: theme.colors.subText,
     marginTop: 2,
   },
   statusContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#e6f4ea",
+    backgroundColor: theme.colors.background,
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 15,
   },
   orderStatus: {
     fontSize: 14,
-    color: "#00b852",
+    color: theme.colors.success,
     marginLeft: 5,
+    fontWeight: '600',
   },
   itemsContainer: {
     padding: 15,
@@ -366,6 +267,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 100,
     borderRadius: 5,
+    backgroundColor: theme.colors.background,
   },
   itemInfo: {
     flex: 1,
@@ -373,28 +275,24 @@ const styles = StyleSheet.create({
   },
   brandName: {
     fontSize: 14,
-    color: "#666",
-    marginBottom: 2,
+    color: theme.colors.subText,
+    fontWeight: 'bold',
   },
   itemName: {
     fontSize: 16,
-    color: "#3e3e3e",
-    marginBottom: 2,
-  },
-  itemSize: {
-    fontSize: 14,
-    color: "#666",
+    color: theme.colors.text,
     marginBottom: 2,
   },
   itemPrice: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#3e3e3e",
+    color: theme.colors.text,
   },
   orderDetails: {
     padding: 15,
     borderTopWidth: 1,
-    borderTopColor: "#f0f0f0",
+    borderTopColor: theme.colors.border,
+    backgroundColor: theme.colors.background,
   },
   detailSection: {
     marginBottom: 20,
@@ -407,12 +305,12 @@ const styles = StyleSheet.create({
   detailTitle: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#3e3e3e",
+    color: theme.colors.text,
     marginLeft: 10,
   },
   detailText: {
     fontSize: 14,
-    color: "#666",
+    color: theme.colors.subText,
     lineHeight: 20,
   },
   trackingInfo: {
@@ -420,12 +318,12 @@ const styles = StyleSheet.create({
   },
   trackingNumber: {
     fontSize: 14,
-    color: "#666",
+    color: theme.colors.text,
     marginBottom: 5,
   },
   trackingCarrier: {
     fontSize: 14,
-    color: "#666",
+    color: theme.colors.subText,
   },
   timeline: {
     marginTop: 15,
@@ -439,8 +337,9 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: "#ff3f6c",
+    backgroundColor: theme.colors.primary,
     marginTop: 5,
+    zIndex: 2,
   },
   timelineLine: {
     position: "absolute",
@@ -448,7 +347,7 @@ const styles = StyleSheet.create({
     top: 17,
     width: 2,
     height: "100%",
-    backgroundColor: "#f0f0f0",
+    backgroundColor: theme.colors.border,
   },
   timelineContent: {
     marginLeft: 15,
@@ -457,22 +356,22 @@ const styles = StyleSheet.create({
   timelineStatus: {
     fontSize: 14,
     fontWeight: "bold",
-    color: "#3e3e3e",
+    color: theme.colors.text,
     marginBottom: 2,
   },
   timelineLocation: {
     fontSize: 14,
-    color: "#666",
+    color: theme.colors.subText,
     marginBottom: 2,
   },
   timelineTimestamp: {
     fontSize: 12,
-    color: "#999",
+    color: theme.colors.subText,
   },
   orderFooter: {
     padding: 15,
     borderTopWidth: 1,
-    borderTopColor: "#f0f0f0",
+    borderTopColor: theme.colors.border,
   },
   totalContainer: {
     flexDirection: "row",
@@ -482,12 +381,12 @@ const styles = StyleSheet.create({
   },
   totalLabel: {
     fontSize: 16,
-    color: "#666",
+    color: theme.colors.subText,
   },
   totalAmount: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#3e3e3e",
+    color: theme.colors.text,
   },
   detailsButton: {
     flexDirection: "row",
@@ -497,7 +396,8 @@ const styles = StyleSheet.create({
   },
   detailsButtonText: {
     fontSize: 16,
-    color: "#ff3f6c",
+    color: theme.colors.primary,
     marginRight: 5,
+    fontWeight: 'bold',
   },
 });

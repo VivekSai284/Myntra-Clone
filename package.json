@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "fast-csv": "^5.0.5",
+    "json2csv": "^6.0.0-alpha.2",
+    "mongoose": "^9.2.3",
+    "pdfkit": "^0.17.2"
+  }
+}

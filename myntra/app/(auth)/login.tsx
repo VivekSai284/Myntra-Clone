@@ -13,6 +13,7 @@ import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@/context/AuthContext";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
+import { useTheme } from "@/hooks/useTheme";
 
 export default function Login() {
   const { login } = useAuth();
@@ -21,7 +22,10 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  const { theme } = useTheme(); // Assuming this returns your color object
+  const styles = createStyles(theme);
   const [isloading, setisloading] = useState(false);
+
   const handleLogin = async () => {
     try {
       setisloading(true);
@@ -46,18 +50,22 @@ export default function Login() {
       <View style={styles.formContainer}>
         <Text style={styles.title}>Welcome to Myntra</Text>
         <Text style={styles.subtitle}>Login to continue shopping</Text>
+        
         <TextInput
           style={styles.input}
           placeholder="Email"
+          placeholderTextColor={theme.colors.subText}
           value={email}
           onChangeText={setEmail}
           autoCapitalize="none"
           keyboardType="email-address"
         />
+
         <View style={styles.passwordContainer}>
           <TextInput
             style={styles.passwordInput}
             placeholder="Password"
+            placeholderTextColor={theme.colors.subText}
             value={password}
             onChangeText={setPassword}
             secureTextEntry={!showPassword}
@@ -66,13 +74,14 @@ export default function Login() {
             style={styles.eyeIcon}
             onPress={() => setShowPassword(!showPassword)}
           >
-            {showPassword ? (
-              <Ionicons name="eye-off-outline" size={20} color="gray" />
-            ) : (
-              <Ionicons name="eye-outline" size={20} color="gray" />
-            )}
+            <Ionicons 
+              name={showPassword ? "eye-off-outline" : "eye-outline"} 
+              size={20} 
+              color={theme.colors.subText} 
+            />
           </TouchableOpacity>
         </View>
+
         <TouchableOpacity
           style={styles.button}
           onPress={handleLogin}
@@ -96,77 +105,84 @@ export default function Login() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  backgroundImage: {
-    width: "100%",
-    height: "50%",
-    position: "absolute",
-    top: 0,
-  },
-  formContainer: {
-    flex: 1,
-    justifyContent: "center",
-    padding: 20,
-    backgroundColor: "rgba(255, 255, 255, 0.9)",
-    marginTop: "60%",
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    marginBottom: 10,
-    color: "#3e3e3e",
-  },
-  subtitle: {
-    fontSize: 16,
-    color: "#666",
-    marginBottom: 30,
-  },
-  input: {
-    backgroundColor: "#f5f5f5",
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 15,
-    fontSize: 16,
-  },
-  passwordContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#f5f5f5",
-    borderRadius: 10,
-    marginBottom: 15,
-  },
-  passwordInput: {
-    flex: 1,
-    padding: 15,
-    fontSize: 16,
-  },
-  eyeIcon: {
-    padding: 15,
-  },
-  button: {
-    backgroundColor: "#ff3f6c",
-    padding: 15,
-    borderRadius: 10,
-    alignItems: "center",
-    marginTop: 10,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  signupLink: {
-    marginTop: 20,
-    alignItems: "center",
-  },
-  signupText: {
-    color: "#ff3f6c",
-    fontSize: 16,
-  },
-});
+const createStyles = (theme: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    backgroundImage: {
+      width: "100%",
+      height: "50%",
+      position: "absolute",
+      top: 0,
+    },
+    formContainer: {
+      flex: 1,
+      justifyContent: "center",
+      padding: 20,
+      backgroundColor: theme.colors.opacity,
+      marginTop: "60%",
+      borderTopLeftRadius: 30,
+      borderTopRightRadius: 30,
+    },
+    title: {
+      fontSize: 28,
+      fontWeight: "bold",
+      marginBottom: 10,
+      color: theme.colors.text,
+    },
+    subtitle: {
+      fontSize: 16,
+      color: theme.colors.subText,
+      marginBottom: 30,
+    },
+    input: {
+      backgroundColor: theme.colors.card,
+      color: theme.colors.text,
+      padding: 15,
+      borderRadius: 10,
+      marginBottom: 15,
+      fontSize: 16,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    passwordContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: theme.colors.card,
+      borderRadius: 10,
+      marginBottom: 15,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    passwordInput: {
+      flex: 1,
+      padding: 15,
+      fontSize: 16,
+      color: theme.colors.text,
+    },
+    eyeIcon: {
+      padding: 15,
+    },
+    button: {
+      backgroundColor: theme.colors.primary,
+      padding: 15,
+      borderRadius: 10,
+      alignItems: "center",
+      marginTop: 10,
+    },
+    buttonText: {
+      color: "#fff", // Kept white for contrast against primary pink
+      fontSize: 16,
+      fontWeight: "bold",
+    },
+    signupLink: {
+      marginTop: 20,
+      alignItems: "center",
+    },
+    signupText: {
+      color: theme.colors.primary,
+      fontSize: 16,
+    },
+  });

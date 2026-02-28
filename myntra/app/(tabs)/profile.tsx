@@ -12,6 +12,8 @@ import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
+import { useTheme } from "@/hooks/useTheme";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const menuItems = [
   { icon: "cube-outline", label: "Orders", route: "/orders" },
@@ -25,11 +27,8 @@ export default function Profile() {
   const router = useRouter();
   const { user, logout } = useAuth();
   const { recentlyViewed } = useRecentlyViewed();
-
-  const handleLogout = () => {
-    logout();
-    router.replace("/");
-  };
+  const { theme } = useTheme();
+  const styles = createStyles(theme);
 
   if (!user) {
     return (
@@ -38,15 +37,19 @@ export default function Profile() {
           <Text style={styles.headerTitle}>Profile</Text>
         </View>
         <View style={styles.emptyState}>
-          <Ionicons name="person-outline" size={64} color="#ff3f6c" />
+          <Ionicons
+            name="person-circle-outline"
+            size={80}
+            color={theme.colors.primary}
+          />
           <Text style={styles.emptyTitle}>
-            Please login to view your profile
+            Login to personalize your experience
           </Text>
           <TouchableOpacity
             style={styles.loginButton}
             onPress={() => router.push("/login")}
           >
-            <Text style={styles.loginButtonText}>LOGIN</Text>
+            <Text style={styles.loginButtonText}>LOGIN / SIGNUP</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -56,18 +59,21 @@ export default function Profile() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Profile</Text>
+        <Text style={styles.headerTitle}>Account</Text>
       </View>
-
       <ScrollView style={styles.content}>
         <View style={styles.userInfo}>
-          <View style={styles.avatar}>
-            <Ionicons name="person-outline" size={40} color="#fff" />
+          <View style={styles.leftUser}>
+            <View style={styles.avatar}>
+              <Ionicons name="person" size={40} color="#fff" />
+            </View>
+            <View style={styles.userDetails}>
+              <Text style={styles.userName}>{user.name}</Text>
+              <Text style={styles.userEmail}>{user.email}</Text>
+            </View>
           </View>
-          <View style={styles.userDetails}>
-            <Text style={styles.userName}>{user.name}</Text>
-            <Text style={styles.userEmail}>{user.email}</Text>
-          </View>
+
+          <ThemeToggle />
         </View>
 
         <View style={styles.menuSection}>
@@ -78,56 +84,46 @@ export default function Profile() {
               onPress={() => router.push(item.route as any)}
             >
               <View style={styles.menuItemLeft}>
-                <Ionicons name={item.icon as any} size={24} color="#3e3e3e" />
+                <Ionicons
+                  name={item.icon as any}
+                  size={22}
+                  color={theme.colors.text}
+                />
                 <Text style={styles.menuItemLabel}>{item.label}</Text>
               </View>
               <Ionicons
-                name="chevron-forward-outline"
-                size={24}
-                color="#3e3e3e"
+                name="chevron-forward"
+                size={20}
+                color={theme.colors.subText}
               />
             </TouchableOpacity>
           ))}
         </View>
-        {/* ✅ Recently Viewed Section */}
-        <View style={{ marginTop: 25, paddingHorizontal: 15 }}>
-          <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}>
-            Recently Viewed
-          </Text>
 
-          {recentlyViewed.length === 0 ? (
-            <Text style={{ color: "#666" }}>No recently viewed products</Text>
-          ) : (
+        {recentlyViewed.length > 0 && (
+          <View style={styles.recentSection}>
+            <Text style={styles.sectionTitle}>Recently Viewed</Text>
             <FlatList
               data={recentlyViewed}
               keyExtractor={(item) => item._id}
               horizontal
               showsHorizontalScrollIndicator={false}
               renderItem={({ item }) => (
-                <TouchableOpacity style={{ marginRight: 12 }}>
+                <TouchableOpacity style={styles.recentCard}>
                   <Image
                     source={{ uri: item.images?.[0] }}
-                    style={{
-                      width: 90,
-                      height: 90,
-                      borderRadius: 10,
-                      backgroundColor: "#f5f5f5",
-                    }}
+                    style={styles.recentImage}
                   />
-                  <Text
-                    numberOfLines={1}
-                    style={{ width: 90, marginTop: 5, fontSize: 12 }}
-                  >
+                  <Text numberOfLines={1} style={styles.recentName}>
                     {item.name}
                   </Text>
                 </TouchableOpacity>
               )}
             />
-          )}
-        </View>
+          </View>
+        )}
 
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Ionicons name="chevron-forward-outline" size={24} color="#ff3f6c" />
+        <TouchableOpacity style={styles.logoutButton} onPress={logout}>
           <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -135,113 +131,104 @@ export default function Profile() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  header: {
-    padding: 15,
-    paddingTop: 50,
-    backgroundColor: "#fff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#3e3e3e",
-  },
-  content: {
-    flex: 1,
-  },
-  emptyState: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    color: "#3e3e3e",
-    marginTop: 20,
-    marginBottom: 20,
-  },
-  loginButton: {
-    backgroundColor: "#ff3f6c",
-    paddingHorizontal: 40,
-    paddingVertical: 15,
-    borderRadius: 10,
-  },
-  loginButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  userInfo: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 20,
-    backgroundColor: "#fff",
-  },
-  avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: "#ff3f6c",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  userDetails: {
-    marginLeft: 15,
-  },
-  userName: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#3e3e3e",
-    marginBottom: 5,
-  },
-  userEmail: {
-    fontSize: 14,
-    color: "#666",
-  },
-  menuSection: {
-    marginTop: 20,
-  },
-  menuItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: 15,
-    backgroundColor: "#fff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
-  },
-  menuItemLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  menuItemLabel: {
-    fontSize: 16,
-    color: "#3e3e3e",
-    marginLeft: 15,
-  },
-  logoutButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 15,
-    marginTop: 20,
-    marginHorizontal: 15,
-    borderRadius: 10,
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "#ff3f6c",
-  },
-  logoutText: {
-    marginLeft: 10,
-    fontSize: 16,
-    color: "#ff3f6c",
-    fontWeight: "bold",
-  },
-});
+const createStyles = (theme: any) =>
+  StyleSheet.create({
+    container: { flex: 1, backgroundColor: theme.colors.background },
+    header: {
+      padding: 15,
+      paddingTop: 50,
+      backgroundColor: theme.colors.background,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border,
+    },
+    headerTitle: { fontSize: 24, fontWeight: "bold", color: theme.colors.text },
+    content: { flex: 1 },
+    emptyState: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      padding: 20,
+    },
+    emptyTitle: {
+      fontSize: 16,
+      color: theme.colors.subText,
+      marginVertical: 20,
+      textAlign: "center",
+    },
+    loginButton: {
+      backgroundColor: theme.colors.primary,
+      paddingHorizontal: 30,
+      paddingVertical: 12,
+      borderRadius: 4,
+    },
+    loginButtonText: { color: "#fff", fontWeight: "bold" },
+    userInfo: {
+      flexDirection: "row",
+      alignItems: "center",
+      padding: 20,
+      backgroundColor: theme.colors.card,
+      margin: 15,
+      borderRadius: 10,
+      justifyContent: "space-between",
+    },
+    avatar: {
+      width: 70,
+      height: 70,
+      borderRadius: 35,
+      backgroundColor: theme.colors.primary,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    userDetails: { marginLeft: 15 },
+    userName: { fontSize: 18, fontWeight: "bold", color: theme.colors.text },
+    userEmail: { fontSize: 14, color: theme.colors.subText, marginTop: 2 },
+    menuSection: {
+      backgroundColor: theme.colors.card,
+      borderTopWidth: 1,
+      borderBottomWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    menuItem: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      padding: 18,
+      borderBottomWidth: 0.5,
+      borderBottomColor: theme.colors.border,
+    },
+    menuItemLeft: { flexDirection: "row", alignItems: "center" },
+    menuItemLabel: { fontSize: 15, color: theme.colors.text, marginLeft: 15 },
+    recentSection: { marginTop: 25, paddingHorizontal: 15 },
+    sectionTitle: {
+      fontSize: 16,
+      fontWeight: "bold",
+      color: theme.colors.text,
+      marginBottom: 15,
+    },
+    recentCard: { marginRight: 12, width: 100 },
+    recentImage: {
+      width: 100,
+      height: 100,
+      borderRadius: 8,
+      backgroundColor: theme.colors.card,
+    },
+    recentName: { marginTop: 5, fontSize: 12, color: theme.colors.text },
+    logoutButton: {
+      margin: 20,
+      padding: 15,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: theme.colors.primary,
+      alignItems: "center",
+    },
+    logoutText: {
+      color: theme.colors.primary,
+      fontWeight: "bold",
+      fontSize: 16,
+    },
+    leftUser: {
+      flexDirection: "row",
+      alignItems: "center",
+      flex: 1,
+    },
+  });
