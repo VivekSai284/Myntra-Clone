@@ -5,15 +5,10 @@ const AuditLog = require("../models/AuditLog");
 
 router.post("/payment", async (req, res) => {
   try {
-    const event = req.body;
+    const event = req.body || {};
 
-    console.log("📩 Webhook received:", event);
-
-    const eventId = event.id;
-    const paymentId = event.payment_id || event.paymentId;
-
-    if (!eventId || !paymentId) {
-      return res.status(400).json({ error: "Missing required fields" });
+    if (!event.id) {
+      return res.status(400).json({ error: "Invalid webhook payload" });
     }
 
     // 🛑 IDEMPOTENCY CHECK
