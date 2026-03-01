@@ -24,12 +24,17 @@ export default function Transactions() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   const fetchTransactions = async (pageNumber = 1) => {
     if (!user) return;
 
     try {
-      setLoading(true);
+      if (pageNumber === 1) {
+        setLoading(true);
+      } else {
+        setLoadingMore(true);
+      }
 
       const res = await axios.get(`${BASE_URL}/api/transactions`, {
         params: {
@@ -42,17 +47,24 @@ export default function Transactions() {
         },
       });
 
-      setTransactions(res.data.data);
+      const newData = res.data.data;
+
+      setTransactions((prev) =>
+        pageNumber === 1 ? newData : [...prev, ...newData],
+      );
+
       setTotalPages(res.data.pages);
       setPage(res.data.page);
     } catch (err) {
       console.log(err);
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   };
 
   useEffect(() => {
+    setTransactions([]);
     fetchTransactions(1);
   }, [statusFilter]);
 
@@ -65,15 +77,15 @@ export default function Transactions() {
             styles.status,
             {
               color:
-                item.status === "SUCCESS"
+                item.status?.toLowerCase() === "success"
                   ? theme.colors.success
-                  : item.status === "FAILED"
+                  : item.status?.toLowerCase() === "failed"
                     ? theme.colors.error
                     : theme.colors.text,
             },
           ]}
         >
-          {item.status}
+          {item.status?.toUpperCase()}
         </Text>
       </View>
 
@@ -92,6 +104,13 @@ export default function Transactions() {
       </TouchableOpacity>
     </View>
   );
+
+  const loadMore = () => {
+    if (loadingMore) return;
+    if (page >= totalPages) return;
+
+    fetchTransactions(page + 1);
+  };
 
   return (
     <View style={styles.container}>
@@ -132,29 +151,15 @@ export default function Transactions() {
           data={transactions}
           keyExtractor={(item) => item._id}
           renderItem={renderItem}
+          onEndReached={loadMore}
+          onEndReachedThreshold={0.4}
+          ListFooterComponent={
+            loadingMore ? (
+              <ActivityIndicator size="small" color={theme.colors.primary} />
+            ) : null
+          }
         />
       )}
-
-      {/* Pagination */}
-      <View style={styles.pagination}>
-        <TouchableOpacity
-          disabled={page === 1}
-          onPress={() => fetchTransactions(page - 1)}
-        >
-          <Text style={styles.pageBtn}>Prev</Text>
-        </TouchableOpacity>
-
-        <Text style={styles.pageInfo}>
-          {page} / {totalPages}
-        </Text>
-
-        <TouchableOpacity
-          disabled={page === totalPages}
-          onPress={() => fetchTransactions(page + 1)}
-        >
-          <Text style={styles.pageBtn}>Next</Text>
-        </TouchableOpacity>
-      </View>
     </View>
   );
 }
