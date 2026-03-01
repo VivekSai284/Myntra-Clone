@@ -1,9 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const Transaction = require("../models/Transaction");
-const { Parser } = require("json2csv");
+const PDFDocument = require("pdfkit");
 
-// ✅ GET transactions with filtering + sorting + pagination
+const MAX_LIMIT = 50;
+
+/* =====================================================
+   ✅ GET transactions (filter + sort + pagination)
+===================================================== */
 router.get("/", async (req, res) => {
   try {
     const {
@@ -11,78 +15,100 @@ router.get("/", async (req, res) => {
       page = 1,
       limit = 10,
       status,
+      paymentMode,
       sortBy = "createdAt",
       order = "desc",
     } = req.query;
 
+    if (!userId) {
+      return res.status(400).json({ error: "userId required" });
+    }
+
+    const pageNum = parseInt(page);
+    const limitNum = Math.min(parseInt(limit), MAX_LIMIT);
+
     const query = { userId };
 
     if (status) query.status = status;
+    if (paymentMode) query.paymentMode = paymentMode;
 
     const transactions = await Transaction.find(query)
       .sort({ [sortBy]: order === "asc" ? 1 : -1 })
-      .skip((page - 1) * limit)
-      .limit(Number(limit));
+      .skip((pageNum - 1) * limitNum)
+      .limit(limitNum);
 
     const total = await Transaction.countDocuments(query);
 
     res.json({
       data: transactions,
       total,
-      page: Number(page),
-      pages: Math.ceil(total / limit),
+      page: pageNum,
+      pages: Math.ceil(total / limitNum),
     });
   } catch (err) {
+    console.log(err);
     res.status(500).json({ error: "Failed to fetch transactions" });
   }
 });
 
-router.get("/export/csv", async (req, res) => {
+/* =====================================================
+   ✅ STREAMING CSV EXPORT (MEMORY SAFE)
+===================================================== */
+router.get("/export/csv/:userId", async (req, res) => {
   try {
-    const { userId } = req.query;
+    const { userId } = req.params;
 
     res.setHeader("Content-Type", "text/csv");
     res.setHeader(
       "Content-Disposition",
-      "attachment; filename=transactions.csv",
+      "attachment; filename=transactions.csv"
     );
 
-    const cursor = Transaction.find({ userId }).cursor();
-
+    // header row
     res.write("Invoice,Amount,Status,PaymentMode,Date\n");
 
+    const cursor = Transaction.find({ userId })
+      .sort({ createdAt: -1 })
+      .cursor();
+
     for await (const doc of cursor) {
-      const row = `${doc.invoiceId},${doc.amount},${doc.status},${doc.paymentMode},${doc.createdAt}\n`;
+      const row = `${doc.invoiceId || ""},${doc.amount},${doc.status},${doc.paymentMode},${doc.createdAt}\n`;
       res.write(row);
     }
 
     res.end();
   } catch (err) {
+    console.log(err);
     res.status(500).json({ error: "CSV export failed" });
   }
 });
 
-const PDFDocument = require("pdfkit");
-
+/* =====================================================
+   ✅ PDF RECEIPT
+===================================================== */
 router.get("/receipt/:id", async (req, res) => {
   try {
     const txn = await Transaction.findById(req.params.id);
 
-    if (!txn) return res.status(404).send("Not found");
+    if (!txn) {
+      return res.status(404).send("Transaction not found");
+    }
 
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename=receipt-${txn.invoiceId}.pdf`,
+      `attachment; filename=receipt-${txn.invoiceId}.pdf`
     );
 
-    const doc = new PDFDocument();
+    const doc = new PDFDocument({ margin: 50 });
     doc.pipe(res);
 
-    doc.fontSize(20).text("Payment Receipt");
+    doc.fontSize(20).text("Payment Receipt", { align: "center" });
     doc.moveDown();
 
-    doc.text(`Invoice: ${txn.invoiceId}`);
+    doc.fontSize(12);
+    doc.text(`Invoice ID: ${txn.invoiceId}`);
+    doc.text(`Payment ID: ${txn.paymentId}`);
     doc.text(`Amount: ₹${txn.amount}`);
     doc.text(`Status: ${txn.status}`);
     doc.text(`Payment Mode: ${txn.paymentMode}`);
@@ -90,49 +116,8 @@ router.get("/receipt/:id", async (req, res) => {
 
     doc.end();
   } catch (err) {
-    res.status(500).send("PDF failed");
-  }
-});
-
-router.get("/export/csv/:userId", async (req, res) => {
-  try {
-    const { status } = req.query;
-
-    const query = { userId: req.params.userId };
-    if (status) query.status = status;
-
-    const cursor = RecentlyViewed.find(query)
-      .sort({ createdAt: -1 })
-      .cursor();
-
-    res.setHeader(
-      "Content-Disposition",
-      "attachment; filename=transactions.csv"
-    );
-    res.setHeader("Content-Type", "text/csv");
-
-    const fields = [
-      "paymentMode",
-      "amount",
-      "status",
-      "createdAt",
-    ];
-
-    const parser = new Parser({ fields });
-
-    let isFirst = true;
-
-    for await (const doc of cursor) {
-      const csv =
-        parser.parse([doc], { header: isFirst }) + "\n";
-      res.write(csv);
-      isFirst = false;
-    }
-
-    res.end();
-  } catch (err) {
     console.log(err);
-    res.status(500).json({ error: "Export failed" });
+    res.status(500).send("PDF failed");
   }
 });
 

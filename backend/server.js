@@ -9,6 +9,7 @@ const Wishlistroutes = require("./routes/Wishlistroutes");
 const OrderRoutes = require("./routes/OrderRoutes");
 const recentlyViewedRoutes = require("./routes/RecentlyViewedRoutes");
 const webhookRoutes = require("./routes/webhookRoutes");
+const transactionRoutes = require("./routes/transactionRoutes");
 const cors = require('cors');
 dotenv.config();
 const app = express();
@@ -29,6 +30,7 @@ app.use("/wishlist", Wishlistroutes);
 app.use("/Order", OrderRoutes);
 app.use("/recently-viewed", recentlyViewedRoutes);
 app.use("/api/webhook", webhookRoutes);
+app.use("/transactions", transactionRoutes);
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {

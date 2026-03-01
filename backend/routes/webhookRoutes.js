@@ -27,6 +27,8 @@ router.post("/payment", async (req, res) => {
       return res.json({ message: "Already processed" });
     }
 
+    const invoiceId = `INV-${Date.now()}`;
+
     // ✅ UPSERT TRANSACTION
     const tx = await Transaction.findOneAndUpdate(
       { paymentId },
@@ -37,7 +39,9 @@ router.post("/payment", async (req, res) => {
         amount: event.amount,
         status: event.status,
         webhookEventId: eventId,
+        invoiceId, // ✅ ADD THIS
       },
+      
       { upsert: true, new: true }
     );
 

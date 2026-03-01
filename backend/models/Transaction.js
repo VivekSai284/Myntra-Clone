@@ -27,6 +27,11 @@ const transactionSchema = new mongoose.Schema(
       default: "PENDING",
       index: true,
     },
+    invoiceId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
 
     paidAt: { type: Date },
     paymentId: {
