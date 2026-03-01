@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -14,27 +14,24 @@ import * as Linking from "expo-linking";
 
 const BASE_URL = "https://myntra-clone-j4a9.onrender.com";
 
-export default function Transactions() {
+export default function TransactionsList() {
   const { user } = useAuth();
   const { theme } = useTheme();
   const styles = createStyles(theme);
 
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
-  const [loadingMore, setLoadingMore] = useState(false);
 
-  const fetchTransactions = async (pageNumber = 1) => {
+  // ✅ FETCH
+  const fetchTransactions = async (pageNumber = 1, append = false) => {
     if (!user) return;
 
     try {
-      if (pageNumber === 1) {
-        setLoading(true);
-      } else {
-        setLoadingMore(true);
-      }
+      pageNumber === 1 ? setLoading(true) : setLoadingMore(true);
 
       const res = await axios.get(`${BASE_URL}/api/transactions`, {
         params: {
@@ -47,10 +44,8 @@ export default function Transactions() {
         },
       });
 
-      const newData = res.data.data;
-
       setTransactions((prev) =>
-        pageNumber === 1 ? newData : [...prev, ...newData],
+        append ? [...prev, ...res.data.data] : res.data.data,
       );
 
       setTotalPages(res.data.pages);
@@ -64,14 +59,20 @@ export default function Transactions() {
   };
 
   useEffect(() => {
-    setTransactions([]);
     fetchTransactions(1);
   }, [statusFilter]);
+
+  // ✅ INFINITE SCROLL
+  const loadMore = useCallback(() => {
+    if (loadingMore || loading || page >= totalPages) return;
+    fetchTransactions(page + 1, true);
+  }, [page, totalPages, loadingMore, loading]);
 
   const renderItem = ({ item }: any) => (
     <View style={styles.card}>
       <View style={styles.row}>
         <Text style={styles.amount}>₹{item.amount}</Text>
+
         <Text
           style={[
             styles.status,
@@ -105,16 +106,12 @@ export default function Transactions() {
     </View>
   );
 
-  const loadMore = () => {
-    if (loadingMore) return;
-    if (page >= totalPages) return;
-
-    fetchTransactions(page + 1);
-  };
-
   return (
-    <View style={styles.container}>
+    <View style={{ flex: 1 }}>
+      {/* Title */}
       <Text style={styles.title}>My Transactions</Text>
+
+      {/* Export */}
       <TouchableOpacity
         style={styles.exportBtn}
         onPress={() =>
@@ -126,7 +123,7 @@ export default function Transactions() {
         <Text style={styles.exportText}>Export CSV</Text>
       </TouchableOpacity>
 
-      {/* Filter Buttons */}
+      {/* Filters */}
       <View style={styles.filterRow}>
         {["ALL", "SUCCESS", "FAILED"].map((status) => (
           <TouchableOpacity
@@ -144,6 +141,7 @@ export default function Transactions() {
         ))}
       </View>
 
+      {/* List */}
       {loading ? (
         <ActivityIndicator size="large" color={theme.colors.primary} />
       ) : (
@@ -153,6 +151,11 @@ export default function Transactions() {
           renderItem={renderItem}
           onEndReached={loadMore}
           onEndReachedThreshold={0.4}
+          showsVerticalScrollIndicator={false}
+          removeClippedSubviews
+          initialNumToRender={8}
+          maxToRenderPerBatch={10}
+          windowSize={7}
           ListFooterComponent={
             loadingMore ? (
               <ActivityIndicator size="small" color={theme.colors.primary} />
@@ -166,15 +169,10 @@ export default function Transactions() {
 
 const createStyles = (theme: any) =>
   StyleSheet.create({
-    container: {
-      flex: 1,
-      padding: 16,
-      backgroundColor: theme.colors.background,
-    },
     title: {
-      fontSize: 22,
+      fontSize: 20,
       fontWeight: "bold",
-      marginBottom: 16,
+      marginBottom: 12,
       color: theme.colors.text,
     },
     card: {
@@ -228,19 +226,6 @@ const createStyles = (theme: any) =>
     filterText: {
       color: theme.colors.text,
       fontWeight: "500",
-    },
-    pagination: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginTop: 10,
-    },
-    pageBtn: {
-      color: theme.colors.primary,
-      fontWeight: "bold",
-    },
-    pageInfo: {
-      color: theme.colors.text,
     },
     exportBtn: {
       backgroundColor: theme.colors.primary,

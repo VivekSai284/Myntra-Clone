@@ -56,30 +56,43 @@ router.get("/", async (req, res) => {
 ===================================================== */
 router.get("/export/csv/:userId", async (req, res) => {
   try {
-    const { userId } = req.params;
+    const { status } = req.query;
 
-    res.setHeader("Content-Type", "text/csv");
+    const query = { userId: req.params.userId };
+    if (status) query.status = status;
+
+    const cursor = Transaction.find(query) // ✅ FIXED
+      .sort({ createdAt: -1 })
+      .cursor();
+
     res.setHeader(
       "Content-Disposition",
       "attachment; filename=transactions.csv"
     );
+    res.setHeader("Content-Type", "text/csv");
 
-    // header row
-    res.write("Invoice,Amount,Status,PaymentMode,Date\n");
+    const fields = [
+      "invoiceId",
+      "paymentMode",
+      "amount",
+      "status",
+      "createdAt",
+    ];
 
-    const cursor = Transaction.find({ userId })
-      .sort({ createdAt: -1 })
-      .cursor();
+    const parser = new Parser({ fields });
+
+    let isFirst = true;
 
     for await (const doc of cursor) {
-      const row = `${doc.invoiceId || ""},${doc.amount},${doc.status},${doc.paymentMode},${doc.createdAt}\n`;
-      res.write(row);
+      const csv = parser.parse([doc], { header: isFirst }) + "\n";
+      res.write(csv);
+      isFirst = false;
     }
 
     res.end();
   } catch (err) {
     console.log(err);
-    res.status(500).json({ error: "CSV export failed" });
+    res.status(500).json({ error: "Export failed" });
   }
 });
 

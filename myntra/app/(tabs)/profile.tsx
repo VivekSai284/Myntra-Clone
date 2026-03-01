@@ -20,6 +20,7 @@ const menuItems = [
   { icon: "heart-outline", label: "Wishlist", route: "/wishlist" },
   { icon: "card-outline", label: "Payment Methods", route: "/payments" },
   { icon: "location-outline", label: "Addresses", route: "/addresses" },
+  { icon: "receipt-outline", label: "Transactions", route: "/transactions" },
   { icon: "settings-outline", label: "Settings", route: "/settings" },
 ];
 
