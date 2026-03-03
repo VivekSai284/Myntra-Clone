@@ -61,15 +61,15 @@ router.get("/export/csv/:userId", async (req, res) => {
     const query = { userId: req.params.userId };
     if (status) query.status = status;
 
-    const cursor = Transaction.find(query) // ✅ FIXED
-      .sort({ createdAt: -1 })
-      .cursor();
+    const transactions = await Transaction.find(query).sort({
+      createdAt: -1,
+    });
 
-    res.setHeader(
-      "Content-Disposition",
-      "attachment; filename=transactions.csv"
-    );
-    res.setHeader("Content-Type", "text/csv");
+    if (!transactions.length) {
+      return res.status(404).json({ message: "No transactions found" });
+    }
+
+    const { Parser } = require("json2csv");
 
     const fields = [
       "invoiceId",
@@ -80,19 +80,14 @@ router.get("/export/csv/:userId", async (req, res) => {
     ];
 
     const parser = new Parser({ fields });
+    const csv = parser.parse(transactions);
 
-    let isFirst = true;
-
-    for await (const doc of cursor) {
-      const csv = parser.parse([doc], { header: isFirst }) + "\n";
-      res.write(csv);
-      isFirst = false;
-    }
-
-    res.end();
+    res.header("Content-Type", "text/csv");
+    res.attachment("transactions.csv");
+    return res.send(csv);
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ error: "Export failed" });
+    console.error("CSV EXPORT ERROR:", err);
+    return res.status(500).json({ error: "Export failed" });
   }
 });
 
