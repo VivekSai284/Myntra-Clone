@@ -60,12 +60,17 @@ exports.updateCartItem = async (req, res) => {
 exports.saveForLater = async (req, res) => {
   try {
     const { cartItemId } = req.body;
+    const userId = req.user.id; // from auth middleware
 
-    const item = await CartItem.findByIdAndUpdate(
-      cartItemId,
+    const item = await CartItem.findOneAndUpdate(
+      { _id: cartItemId, userId, status: "active" },
       { status: "saved" },
       { new: true }
     );
+
+    if (!item) {
+      return res.status(400).json({ message: "Cart item not found or already saved" });
+    }
 
     res.json(item);
   } catch (error) {
