@@ -37,21 +37,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     { email, password }
   );
 
-  const data = res.data.user;
+  const { user, token } = res.data; // ✅ get token
 
-  console.log("LOGIN RESPONSE:", data); // 🔥 debug
-
-  if (data && data._id) {
-    await saveUserData(data._id, data.fullName, data.email);
+  if (user && token) {
+    await saveUserData(
+      user._id,
+      user.fullName,
+      user.email,
+      token // ✅ pass token
+    );
 
     setUser({
-      _id: data._id,
-      name: data.fullName, // ✅ FIXED
-      email: data.email,
+      _id: user._id,
+      name: user.fullName,
+      email: user.email,
     });
 
     setIsAuthenticated(true);
-    await syncRecentlyViewed(data._id);
+    await syncRecentlyViewed(user._id);
   } else {
     throw new Error(res.data.message || "Login failed");
   }

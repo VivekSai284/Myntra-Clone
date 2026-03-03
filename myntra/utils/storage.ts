@@ -8,10 +8,11 @@ const USER_KEY = "user_data";
 export const saveUserData = async (
   id: string,
   name: string,
-  email: string
+  email: string,
+  token: string
 ) => {
   try {
-    const user = { _id: id, name, email };
+    const user = { _id: id, name, email, token }; // ✅ added token
     await AsyncStorage.setItem(USER_KEY, JSON.stringify(user));
   } catch (error) {
     console.log("Error saving user:", error);

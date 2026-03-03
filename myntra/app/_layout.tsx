@@ -8,6 +8,7 @@ import { ThemeProvider } from "@/theme/ThemeContext";
 import React from "react";
 import { AuthProvider } from "@/context/AuthContext";
 import { useTheme } from "@/hooks/useTheme";
+import "@/utils/axiosConfig";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
