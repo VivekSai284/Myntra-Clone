@@ -32,56 +32,55 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const login = async (email: string, password: string) => {
-  const res = await axios.post(
-    "https://myntra-clone-j4a9.onrender.com/user/login",
-    { email, password }
-  );
-
-  const { user, token } = res.data; // ✅ get token
-
-  if (user && token) {
-    await saveUserData(
-      user._id,
-      user.fullName,
-      user.email,
-      token // ✅ pass token
+    const res = await axios.post(
+      "https://myntra-clone-j4a9.onrender.com/user/login",
+      { email, password },
     );
 
-    setUser({
-      _id: user._id,
-      name: user.fullName,
-      email: user.email,
-    });
+    const { user, token } = res.data; // ✅ CORRECT
 
-    setIsAuthenticated(true);
-    await syncRecentlyViewed(user._id);
-  } else {
-    throw new Error(res.data.message || "Login failed");
-  }
-};
+    console.log("LOGIN RESPONSE:", res.data);
+
+    if (user && user._id && token) {
+      // 🔥 SAVE TOKEN ALSO
+      await saveUserData(user._id, user.fullName, user.email, token);
+
+      setUser({
+        _id: user._id,
+        name: user.fullName,
+        email: user.email,
+      });
+
+      setIsAuthenticated(true);
+
+      await syncRecentlyViewed(user._id);
+    } else {
+      throw new Error("Login failed");
+    }
+  };
   const Signup = async (fullName: string, email: string, password: string) => {
-  const res = await axios.post(
-    "https://myntra-clone-j4a9.onrender.com/user/signup",
-    { fullName, email, password }
-  );
+    const res = await axios.post(
+      "https://myntra-clone-j4a9.onrender.com/user/signup",
+      { fullName, email, password },
+    );
 
-  const data = res.data.user;
+    const data = res.data.user;
 
-  if (data && data._id) {
-    await saveUserData(data._id, data.fullName, data.email);
+    if (data && data._id) {
+      await saveUserData(data._id, data.fullName, data.email);
 
-    setUser({
-      _id: data._id,
-      name: data.fullName, // ✅ FIXED
-      email: data.email,
-    });
+      setUser({
+        _id: data._id,
+        name: data.fullName, // ✅ FIXED
+        email: data.email,
+      });
 
-    setIsAuthenticated(true);
-    await syncRecentlyViewed(data._id);
-  } else {
-    throw new Error(res.data.message || "Signup failed");
-  }
-};
+      setIsAuthenticated(true);
+      await syncRecentlyViewed(data._id);
+    } else {
+      throw new Error(res.data.message || "Signup failed");
+    }
+  };
   const logout = async () => {
     await clearUserData();
     setUser(null);
