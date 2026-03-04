@@ -10,7 +10,6 @@ import { AuthProvider } from "@/context/AuthContext";
 import { useTheme } from "@/hooks/useTheme";
 import "@/utils/axiosConfig";
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 function RootNavigator() {
@@ -23,7 +22,6 @@ function RootNavigator() {
         <Stack.Screen name="(auth)" />
       </Stack>
 
-      {/* ✅ Status bar reacts to theme */}
       <StatusBar style={themeName === "dark" ? "light" : "dark"} />
     </>
   );

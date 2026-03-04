@@ -14,6 +14,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import { useTheme } from "@/hooks/useTheme";
 import ThemeToggle from "@/components/ThemeToggle";
+import { router } from "expo-router";
 
 const menuItems = [
   { icon: "cube-outline", label: "Orders", route: "/orders" },

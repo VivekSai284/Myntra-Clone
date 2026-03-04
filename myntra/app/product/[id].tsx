@@ -122,33 +122,33 @@ export default function ProductDetails() {
     }
   };
 
-  // ✅ ADD TO BAG
-  const handleAddToBag = async () => {
-    if (!user) {
-      router.push("/login");
-      return;
-    }
-
-    if (!selectedSize) {
+  // ✅ ADD TO BAG 
+  const handleAddToBag = async () => { 
+    if (!user) { 
+      router.push("/login"); 
+      return; 
+    } 
+    if (!selectedSize) { 
       alert("Please select a size");
-      return;
-    }
-
-    try {
-      setLoading(true);
-      await axios.post(`https://myntra-clone-j4a9.onrender.com/bag`, {
-        userId: user._id,
-        productId: id,
-        size: selectedSize,
-        quantity: 1,
-      });
-      router.push("/bag");
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+       return; 
+      } 
+      
+      try { 
+        setLoading(true);
+         await axios.post("https://myntra-clone-j4a9.onrender.com/bag", 
+          { 
+          userId: user._id,
+           productId: id, 
+           size: selectedSize, 
+           quantity: 1, 
+          }); 
+          router.push("/bag"); 
+        } catch (error) { 
+          console.log(error); 
+        } finally { 
+          setLoading(false);
+         } 
+        };
 
   const handleScroll = (event: any) => {
     const contentOffset = event.nativeEvent.contentOffset;
@@ -269,139 +269,139 @@ export default function ProductDetails() {
 
 const createStyles = (theme: any) =>
   StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-  },
-  loaderContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: theme.colors.background,
-  },
-  carouselContainer: {
-    position: "relative",
-  },
-  productImage: {
-    height: 400,
-  },
-  pagination: {
-    position: "absolute",
-    bottom: 16,
-    flexDirection: "row",
-    width: "100%",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  paginationDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: "rgba(255, 255, 255, 0.5)",
-    marginHorizontal: 4,
-  },
-  paginationDotActive: {
-    backgroundColor: "#fff",
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-  },
-  content: {
-    padding: 20,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-  },
-  brand: {
-    fontSize: 16,
-    color: theme.colors.subText,
-    marginBottom: 5,
-  },
-  name: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: theme.colors.text,
-    marginBottom: 10,
-  },
-  wishlistButton: {
-    padding: 10,
-  },
-  priceContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 15,
-  },
-  price: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: theme.colors.text,
-    marginRight: 10,
-  },
-  discount: {
-    fontSize: 16,
-    color: theme.colors.primary,
-  },
-  description: {
-    fontSize: 16,
-    color: theme.colors.subText,
-    lineHeight: 24,
-    marginBottom: 20,
-  },
-  sizeSection: {
-    marginBottom: 20,
-  },
-  sizeTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: theme.colors.text,
-    marginBottom: 10,
-  },
-  sizeGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
-  },
-  sizeButton: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  selectedSize: {
-    borderColor: theme.colors.primary,
-    backgroundColor: theme.colors.card,
-  },
-  sizeText: {
-    fontSize: 16,
-    color: theme.colors.text,
-  },
-  selectedSizeText: {
-    color: theme.colors.primary,
-    fontWeight: "bold",
-  },
-  footer: {
-    padding: 15,
-    backgroundColor: theme.colors.background,
-    borderTopWidth: 1,
-    borderTopColor: theme.colors.border,
-  },
-  addToBagButton: {
-    backgroundColor: theme.colors.primary,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 15,
-    borderRadius: 10,
-    gap: 10,
-  },
-  addToBagText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-});
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    loaderContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: theme.colors.background,
+    },
+    carouselContainer: {
+      position: "relative",
+    },
+    productImage: {
+      height: 400,
+    },
+    pagination: {
+      position: "absolute",
+      bottom: 16,
+      flexDirection: "row",
+      width: "100%",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    paginationDot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      backgroundColor: "rgba(255, 255, 255, 0.5)",
+      marginHorizontal: 4,
+    },
+    paginationDotActive: {
+      backgroundColor: "#fff",
+      width: 10,
+      height: 10,
+      borderRadius: 5,
+    },
+    content: {
+      padding: 20,
+    },
+    header: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "flex-start",
+    },
+    brand: {
+      fontSize: 16,
+      color: theme.colors.subText,
+      marginBottom: 5,
+    },
+    name: {
+      fontSize: 20,
+      fontWeight: "bold",
+      color: theme.colors.text,
+      marginBottom: 10,
+    },
+    wishlistButton: {
+      padding: 10,
+    },
+    priceContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginBottom: 15,
+    },
+    price: {
+      fontSize: 20,
+      fontWeight: "bold",
+      color: theme.colors.text,
+      marginRight: 10,
+    },
+    discount: {
+      fontSize: 16,
+      color: theme.colors.primary,
+    },
+    description: {
+      fontSize: 16,
+      color: theme.colors.subText,
+      lineHeight: 24,
+      marginBottom: 20,
+    },
+    sizeSection: {
+      marginBottom: 20,
+    },
+    sizeTitle: {
+      fontSize: 16,
+      fontWeight: "bold",
+      color: theme.colors.text,
+      marginBottom: 10,
+    },
+    sizeGrid: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 10,
+    },
+    sizeButton: {
+      width: 60,
+      height: 60,
+      borderRadius: 30,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    selectedSize: {
+      borderColor: theme.colors.primary,
+      backgroundColor: theme.colors.card,
+    },
+    sizeText: {
+      fontSize: 16,
+      color: theme.colors.text,
+    },
+    selectedSizeText: {
+      color: theme.colors.primary,
+      fontWeight: "bold",
+    },
+    footer: {
+      padding: 15,
+      backgroundColor: theme.colors.background,
+      borderTopWidth: 1,
+      borderTopColor: theme.colors.border,
+    },
+    addToBagButton: {
+      backgroundColor: theme.colors.primary,
+      flexDirection: "row",
+      justifyContent: "center",
+      alignItems: "center",
+      padding: 15,
+      borderRadius: 10,
+      gap: 10,
+    },
+    addToBagText: {
+      color: "#fff",
+      fontSize: 16,
+      fontWeight: "bold",
+    },
+  });

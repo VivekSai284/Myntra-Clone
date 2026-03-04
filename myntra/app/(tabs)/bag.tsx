@@ -20,7 +20,9 @@ export default function Bag() {
   const styles = createStyles(theme);
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
-  const [bag, setbag] = useState<any>(null);
+  const [activeItems, setActiveItems] = useState<any[]>([]);
+  const [savedItems, setSavedItems] = useState<any[]>([]);
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
     fetchproduct();
@@ -30,8 +32,13 @@ export default function Bag() {
     if (user) {
       try {
         setIsLoading(true);
-        const bagRes = await axios.get(`https://myntra-clone-j4a9.onrender.com/bag/${user._id}`);
-        setbag(bagRes.data);
+        const bagRes = await axios.get(
+          `https://myntra-clone-j4a9.onrender.com/bag/${user._id}`,
+        );
+
+        setActiveItems(bagRes.data.activeItems);
+        setSavedItems(bagRes.data.savedItems);
+        setTotal(bagRes.data.total);
       } catch (error) {
         console.log(error);
       } finally {
@@ -40,23 +47,68 @@ export default function Bag() {
     }
   };
 
+  const updateQuantity = async (itemId: string, newQty: number) => {
+    try {
+      await axios.put(
+        `https://myntra-clone-j4a9.onrender.com/bag/update/${itemId}`,
+        { quantity: newQty },
+      );
+      fetchproduct();
+    } catch (error: any) {
+      alert(error.response?.data?.message || "Error");
+    }
+  };
+
   const handledelete = async (itemid: any) => {
     try {
-      await axios.delete(`https://myntra-clone-j4a9.onrender.com/bag/${itemid}`);
+      await axios.delete(
+        `https://myntra-clone-j4a9.onrender.com/bag/${itemid}`,
+      );
       fetchproduct();
     } catch (error) {
       console.log(error);
     }
   };
 
+  const handleCheckout = async () => {
+    try {
+      await axios.post(
+        `https://myntra-clone-j4a9.onrender.com/bag/validate/${user._id}`,
+      );
+      // If validation passes
+      router.push("/checkout");
+    } catch (error: any) {
+      const msg = error.response?.data?.message;
+
+      if (msg === "Price changed") {
+        alert(
+          `Price updated from ₹${error.response.data.oldPrice} to ₹${error.response.data.newPrice}`,
+        );
+      } else if (msg === "Stock insufficient") {
+        alert("Some items are out of stock.");
+      } else if (msg === "Product discontinued") {
+        alert("Some items are no longer available.");
+      } else {
+        alert("Cart validation failed.");
+      }
+
+      fetchproduct(); // refresh bag
+    }
+  };
+
   if (!user) {
     return (
       <View style={styles.container}>
-        <View style={styles.header}><Text style={styles.headerTitle}>Shopping Bag</Text></View>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Shopping Bag</Text>
+        </View>
         <View style={styles.emptyState}>
           <Ionicons name="bag-outline" size={64} color={theme.colors.primary} />
           <Text style={styles.emptyTitle}>Please login to view your bag</Text>
-          <TouchableOpacity style={styles.loginButton} onPress={() => router.push("/login")}>
+          <TouchableOpacity
+            style={styles.loginButton}
+            onPress={() => router.push("/login")}
+          >
             <Text style={styles.loginButtonText}>LOGIN</Text>
           </TouchableOpacity>
         </View>
@@ -72,16 +124,19 @@ export default function Bag() {
     );
   }
 
-  const total = bag?.reduce((sum: any, item: any) => sum + item.productId.price * item.quantity, 0);
-
   return (
     <View style={styles.container}>
-      <View style={styles.header}><Text style={styles.headerTitle}>Shopping Bag</Text></View>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Shopping Bag</Text>
+      </View>
 
       <ScrollView style={styles.content}>
-        {bag?.map((item: any) => (
+        {activeItems?.map((item: any) => (
           <View key={item._id} style={styles.bagItem}>
-            <Image source={{ uri: item.productId.images[0] }} style={styles.itemImage} />
+            <Image
+              source={{ uri: item.productId.images[0] }}
+              style={styles.itemImage}
+            />
             <View style={styles.itemInfo}>
               <Text style={styles.brandName}>{item.productId.brand}</Text>
               <Text style={styles.itemName}>{item.productId.name}</Text>
@@ -90,14 +145,31 @@ export default function Bag() {
 
               <View style={styles.quantityContainer}>
                 <TouchableOpacity style={styles.quantityButton}>
-                  <Ionicons name="remove-outline" size={20} color={theme.colors.text} />
+                  <Ionicons
+                    name="remove-outline"
+                    size={20}
+                    color={theme.colors.text}
+                  />
                 </TouchableOpacity>
-                <Text style={[styles.quantity, { color: theme.colors.text }]}>{item.quantity}</Text>
+                <Text style={[styles.quantity, { color: theme.colors.text }]}>
+                  {item.quantity}
+                </Text>
                 <TouchableOpacity style={styles.quantityButton}>
-                  <Ionicons name="add-outline" size={20} color={theme.colors.text} />
+                  <Ionicons
+                    name="add-outline"
+                    size={20}
+                    color={theme.colors.text}
+                  />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.removeButton} onPress={() => handledelete(item._id)}>
-                  <Ionicons name="trash-outline" size={20} color={theme.colors.primary} />
+                <TouchableOpacity
+                  style={styles.removeButton}
+                  onPress={() => handledelete(item._id)}
+                >
+                  <Ionicons
+                    name="trash-outline"
+                    size={20}
+                    color={theme.colors.primary}
+                  />
                 </TouchableOpacity>
               </View>
             </View>
@@ -110,7 +182,10 @@ export default function Bag() {
           <Text style={styles.totalLabel}>Total Amount</Text>
           <Text style={styles.totalAmount}>₹{total}</Text>
         </View>
-        <TouchableOpacity style={styles.checkoutButton} onPress={() => router.push("/checkout")}>
+        <TouchableOpacity
+          style={styles.checkoutButton}
+          onPress={handleCheckout}
+        >
           <Text style={styles.checkoutButtonText}>PLACE ORDER</Text>
         </TouchableOpacity>
       </View>
@@ -118,31 +193,95 @@ export default function Bag() {
   );
 }
 
-const createStyles = (theme: any) => StyleSheet.create({
-  loaderContainer: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: theme.colors.background },
-  container: { flex: 1, backgroundColor: theme.colors.background },
-  header: { padding: 15, paddingTop: 50, backgroundColor: theme.colors.background, borderBottomWidth: 1, borderBottomColor: theme.colors.border },
-  headerTitle: { fontSize: 24, fontWeight: "bold", color: theme.colors.text },
-  content: { flex: 1, padding: 15 },
-  emptyState: { flex: 1, justifyContent: "center", alignItems: "center", padding: 20 },
-  emptyTitle: { fontSize: 18, color: theme.colors.text, marginTop: 20, marginBottom: 20 },
-  loginButton: { backgroundColor: theme.colors.primary, paddingHorizontal: 40, paddingVertical: 15, borderRadius: 10 },
-  loginButtonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
-  bagItem: { flexDirection: "row", backgroundColor: theme.colors.card, borderRadius: 10, marginBottom: 15, overflow: "hidden", borderWidth: 1, borderColor: theme.colors.border },
-  itemImage: { width: 100, height: 120 },
-  itemInfo: { flex: 1, padding: 15 },
-  brandName: { fontSize: 14, color: theme.colors.subText, marginBottom: 5 },
-  itemName: { fontSize: 16, color: theme.colors.text, marginBottom: 5 },
-  itemSize: { fontSize: 14, color: theme.colors.subText, marginBottom: 5 },
-  itemPrice: { fontSize: 16, fontWeight: "bold", color: theme.colors.text, marginBottom: 10 },
-  quantityContainer: { flexDirection: "row", alignItems: "center" },
-  quantityButton: { width: 30, height: 30, borderRadius: 15, backgroundColor: theme.colors.background, justifyContent: "center", alignItems: "center", borderWidth: 1, borderColor: theme.colors.border },
-  quantity: { marginHorizontal: 15, fontSize: 16 },
-  removeButton: { marginLeft: "auto" },
-  footer: { padding: 15, backgroundColor: theme.colors.background, borderTopWidth: 1, borderTopColor: theme.colors.border },
-  totalContainer: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 15 },
-  totalLabel: { fontSize: 16, color: theme.colors.text },
-  totalAmount: { fontSize: 18, fontWeight: "bold", color: theme.colors.text },
-  checkoutButton: { backgroundColor: theme.colors.primary, padding: 15, borderRadius: 10, alignItems: "center" },
-  checkoutButtonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
-});
+const createStyles = (theme: any) =>
+  StyleSheet.create({
+    loaderContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: theme.colors.background,
+    },
+    container: { flex: 1, backgroundColor: theme.colors.background },
+    header: {
+      padding: 15,
+      paddingTop: 50,
+      backgroundColor: theme.colors.background,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border,
+    },
+    headerTitle: { fontSize: 24, fontWeight: "bold", color: theme.colors.text },
+    content: { flex: 1, padding: 15 },
+    emptyState: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      padding: 20,
+    },
+    emptyTitle: {
+      fontSize: 18,
+      color: theme.colors.text,
+      marginTop: 20,
+      marginBottom: 20,
+    },
+    loginButton: {
+      backgroundColor: theme.colors.primary,
+      paddingHorizontal: 40,
+      paddingVertical: 15,
+      borderRadius: 10,
+    },
+    loginButtonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
+    bagItem: {
+      flexDirection: "row",
+      backgroundColor: theme.colors.card,
+      borderRadius: 10,
+      marginBottom: 15,
+      overflow: "hidden",
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    itemImage: { width: 100, height: 120 },
+    itemInfo: { flex: 1, padding: 15 },
+    brandName: { fontSize: 14, color: theme.colors.subText, marginBottom: 5 },
+    itemName: { fontSize: 16, color: theme.colors.text, marginBottom: 5 },
+    itemSize: { fontSize: 14, color: theme.colors.subText, marginBottom: 5 },
+    itemPrice: {
+      fontSize: 16,
+      fontWeight: "bold",
+      color: theme.colors.text,
+      marginBottom: 10,
+    },
+    quantityContainer: { flexDirection: "row", alignItems: "center" },
+    quantityButton: {
+      width: 30,
+      height: 30,
+      borderRadius: 15,
+      backgroundColor: theme.colors.background,
+      justifyContent: "center",
+      alignItems: "center",
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
+    quantity: { marginHorizontal: 15, fontSize: 16 },
+    removeButton: { marginLeft: "auto" },
+    footer: {
+      padding: 15,
+      backgroundColor: theme.colors.background,
+      borderTopWidth: 1,
+      borderTopColor: theme.colors.border,
+    },
+    totalContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 15,
+    },
+    totalLabel: { fontSize: 16, color: theme.colors.text },
+    totalAmount: { fontSize: 18, fontWeight: "bold", color: theme.colors.text },
+    checkoutButton: {
+      backgroundColor: theme.colors.primary,
+      padding: 15,
+      borderRadius: 10,
+      alignItems: "center",
+    },
+    checkoutButtonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
+  });
