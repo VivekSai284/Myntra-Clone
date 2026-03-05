@@ -1,17 +1,33 @@
-const express = require("express")
-const router = express.Router()
+const express = require("express");
+const router = express.Router();
+const Product = require("../models/product");
 
-const { getRecommendations } = require("../services/recommendationService")
+// GET recommendations
+router.get("/:userId/:productId", async (req, res) => {
+  try {
+    const { productId } = req.params;
 
-router.get("/:productId", async (req, res) => {
+    // get current product
+    const product = await Product.findById(productId);
 
-  const userId = req.user.id
-  const productId = req.params.productId
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
 
-  const recs = await getRecommendations(userId, productId)
+    // find similar products (same brand for now)
+    const recommendations = await Product.find({
+      brand: product.brand,
+      _id: { $ne: productId },
+      isActive: true,
+    })
+      .limit(10)
+      .lean();
 
-  res.json(recs)
+    res.json(recommendations);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
-})
-
-module.exports = router
+module.exports = router;
