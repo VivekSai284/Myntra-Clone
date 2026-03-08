@@ -8,7 +8,7 @@ const ProductSchema = new mongoose.Schema(
       type: String,
       required: true,
       enum: ["men", "women", "kids", "beauty"],
-      index: true
+      index: true,
     },
     price: Number,
     discount: String,
@@ -29,13 +29,13 @@ const ProductSchema = new mongoose.Schema(
     popularityScore: {
       type: Number,
       default: 0,
-      index: true
-    }
+      index: true,
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-ProductSchema.index({ name: "text" })
+ProductSchema.index({ name: "text", brand: "text" });
 ProductSchema.index({ category: 1 });
 ProductSchema.index({ popularityScore: -1 });
 

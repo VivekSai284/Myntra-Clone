@@ -155,71 +155,83 @@ export default function Bag() {
       </View>
 
       <ScrollView style={styles.content}>
-        {activeItems?.map((item: any) => (
-          <View key={item._id} style={styles.bagItem}>
-            <Image
-              source={{ uri: item.productId.images[0] }}
-              style={styles.itemImage}
-            />
-            <View style={styles.itemInfo}>
-              <Text style={styles.brandName}>{item.productId.brand}</Text>
-              <Text style={styles.itemName}>{item.productId.name}</Text>
-              <Text style={styles.itemSize}>Size: {item.size}</Text>
-              <Text style={styles.itemPrice}>₹{item.productId.price}</Text>
+        {activeItems
+          ?.filter((item: any) => item?.productId) // 👈 remove broken items
+          .map((item: any) => (
+            <View key={item._id} style={styles.bagItem}>
+              <Image
+                source={{ uri: item.productId.images[0] }}
+                style={styles.itemImage}
+              />
+              <View style={styles.itemInfo}>
+                <Text style={styles.brandName}>{item.productId.brand}</Text>
+                <Text style={styles.itemName}>{item.productId.name}</Text>
+                <Text style={styles.itemSize}>Size: {item.size}</Text>
+                <Text style={styles.itemPrice}>₹{item.productId.price}</Text>
 
-              <View style={styles.bottomRow}>
-                {/* Quantity Controls */}
-                <View style={styles.quantityWrapper}>
-                  <TouchableOpacity
-                    style={styles.qtyButton}
-                    onPress={() =>
-                      item.quantity > 1 &&
-                      updateQuantity(item._id, item.quantity - 1)
-                    }
-                  >
-                    <Ionicons
-                      name="remove"
-                      size={18}
-                      color={theme.colors.text}
-                    />
-                  </TouchableOpacity>
+                <View style={styles.bottomRow}>
+                  {/* Quantity Controls */}
+                  <View style={styles.quantityWrapper}>
+                    <TouchableOpacity
+                      style={styles.qtyButton}
+                      onPress={() =>
+                        item.quantity > 1 &&
+                        updateQuantity(item._id, item.quantity - 1)
+                      }
+                    >
+                      <Ionicons
+                        name="remove"
+                        size={18}
+                        color={theme.colors.text}
+                      />
+                    </TouchableOpacity>
 
-                  <Text style={styles.qtyText}>{item.quantity}</Text>
+                    <Text style={styles.qtyText}>{item.quantity}</Text>
 
-                  <TouchableOpacity
-                    style={styles.qtyButton}
-                    onPress={() => updateQuantity(item._id, item.quantity + 1)}
-                  >
-                    <Ionicons name="add" size={18} color={theme.colors.text} />
-                  </TouchableOpacity>
-                </View>
+                    <TouchableOpacity
+                      style={styles.qtyButton}
+                      onPress={() =>
+                        updateQuantity(item._id, item.quantity + 1)
+                      }
+                    >
+                      <Ionicons
+                        name="add"
+                        size={18}
+                        color={theme.colors.text}
+                      />
+                    </TouchableOpacity>
+                  </View>
 
-                {/* Action Buttons */}
-                <View style={styles.actionButtons}>
-                  <TouchableOpacity
-                    style={styles.saveButton}
-                    onPress={() => moveToSaved(item._id)}
-                  >
-                    <Ionicons
-                      name="bookmark-outline"
-                      size={16}
-                      color={theme.colors.primary}
-                    />
-                    <Text style={styles.saveText}>Save</Text>
-                  </TouchableOpacity>
+                  {/* Action Buttons */}
+                  <View style={styles.actionButtons}>
+                    <TouchableOpacity
+                      style={styles.saveButton}
+                      onPress={() => moveToSaved(item._id)}
+                    >
+                      <Ionicons
+                        name="bookmark-outline"
+                        size={16}
+                        color={theme.colors.primary}
+                      />
+                      <Text style={styles.saveText}>Save</Text>
+                    </TouchableOpacity>
 
-                  <TouchableOpacity
-                    style={styles.deleteButton}
-                    onPress={() => handledelete(item._id)}
-                  >
-                    <Ionicons name="trash-outline" size={16} color="#E53935" />
-                    <Text style={styles.deleteText}>Remove</Text>
-                  </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.deleteButton}
+                      onPress={() => handledelete(item._id)}
+                    >
+                      <Ionicons
+                        name="trash-outline"
+                        size={16}
+                        color="#E53935"
+                      />
+                      <Text style={styles.deleteText}>Remove</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </View>
             </View>
-          </View>
-        ))}
+          ))}
 
         {savedItems.length > 0 && (
           <>

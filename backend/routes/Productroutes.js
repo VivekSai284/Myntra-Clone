@@ -89,4 +89,43 @@ router.get("/recommend/:productId", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
+router.get("/search", async (req, res) => {
+  try {
+    const {
+      q,
+      page = 1,
+      limit = 10,
+      sortBy = "createdAt",
+      order = "desc",
+    } = req.query;
+
+    if (!q) {
+      return res.status(400).json({ message: "Search query required" });
+    }
+
+    const query = {
+      $or: [
+        { name: { $regex: q, $options: "i" } },
+        { category: { $regex: q, $options: "i" } },
+      ],
+    };
+
+    const products = await Product.find(query)
+      .sort({ [sortBy]: order === "asc" ? 1 : -1 })
+      .skip((page - 1) * limit)
+      .limit(Number(limit));
+
+    const total = await Product.countDocuments(query);
+
+    res.json({
+      data: products,
+      total,
+      page: Number(page),
+      pages: Math.ceil(total / limit),
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Search failed" });
+  }
+});
 module.exports = router;
