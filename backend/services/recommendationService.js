@@ -1,40 +1,53 @@
 const Product = require("../models/Product")
 const BrowsingHistory = require("../models/BrowsingHistory")
 const Wishlist = require("../models/Wishlist")
+const mongoose = require("mongoose")
 
 exports.getRecommendations = async (userId, currentProductId) => {
 
   const currentProduct = await Product.findById(currentProductId)
-
   if (!currentProduct) return []
 
-  // Last 10 viewed products
+  const objectUserId = new mongoose.Types.ObjectId(userId)
+  const objectProductId = new mongoose.Types.ObjectId(currentProductId)
+
+  // Last 10 browsing history
   const browsing = await BrowsingHistory
     .find({ userId })
     .sort({ viewedAt: -1 })
     .limit(10)
+    .select("productId")
 
   const viewedIds = browsing.map(b => b.productId)
 
-  // Wishlist products
-  const wishlist = await Wishlist.find({ userId })
+  // Users who wishlisted this product
+  const similarUsers = await Wishlist
+    .find({ productId: objectProductId })
+    .select("userId")
 
-  const wishlistIds = wishlist.map(w => w.productId)
+  const similarUserIds = similarUsers.map(u => u.userId)
 
   const recommendations = await Product.aggregate([
 
     {
       $match: {
-        _id: { $ne: currentProduct._id },
-        isActive: true,
-        stock: { $gt: 0 }
+        _id: { $ne: objectProductId },
+        isActive: true
+      }
+    },
+
+    {
+      $lookup: {
+        from: "wishlists",
+        localField: "_id",
+        foreignField: "productId",
+        as: "wishlistUsers"
       }
     },
 
     {
       $addFields: {
 
-        // category similarity
         categoryScore: {
           $cond: [
             { $eq: ["$category", currentProduct.category] },
@@ -43,7 +56,20 @@ exports.getRecommendations = async (userId, currentProductId) => {
           ]
         },
 
-        // browsing similarity
+        titleScore: {
+          $cond: [
+            {
+              $regexMatch: {
+                input: "$name",
+                regex: currentProduct.name.split(" ")[0],
+                options: "i"
+              }
+            },
+            3,
+            0
+          ]
+        },
+
         browsingScore: {
           $cond: [
             { $in: ["$_id", viewedIds] },
@@ -52,13 +78,13 @@ exports.getRecommendations = async (userId, currentProductId) => {
           ]
         },
 
-        // wishlist similarity
         wishlistScore: {
-          $cond: [
-            { $in: ["$_id", wishlistIds] },
-            4,
-            0
-          ]
+          $size: {
+            $setIntersection: [
+              "$wishlistUsers.userId",
+              similarUserIds
+            ]
+          }
         }
 
       }
@@ -69,25 +95,33 @@ exports.getRecommendations = async (userId, currentProductId) => {
         score: {
           $add: [
             "$categoryScore",
+            "$titleScore",
             "$browsingScore",
             "$wishlistScore",
-
-            // fallback popularity
             { $divide: ["$popularityScore", 100] }
           ]
         }
       }
     },
 
-    {
-      $sort: { score: -1 }
-    },
+    { $sort: { score: -1 } },
+    { $limit: 10 },
 
     {
-      $limit: 10
+      $project: {
+        wishlistUsers: 0
+      }
     }
 
   ])
+
+  // Cold Start Fallback
+  if (recommendations.length === 0) {
+    return await Product
+      .find({ isActive: true })
+      .sort({ popularityScore: -1 })
+      .limit(10)
+  }
 
   return recommendations
 }

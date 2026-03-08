@@ -35,6 +35,7 @@ const ProductSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+ProductSchema.index({ name: "text" })
 ProductSchema.index({ category: 1 });
 ProductSchema.index({ popularityScore: -1 });
 
