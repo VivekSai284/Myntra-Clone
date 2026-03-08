@@ -33,14 +33,59 @@ router.get("/recommend/:productId", async (req, res) => {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    const recommendations = await Product.find({
-      _id: { $ne: productId },
-      brand: currentProduct.brand
-    }).limit(6);
+    // Break product title into keywords
+    const keywords = currentProduct.name.split(" ");
+
+    const recommendations = await Product.aggregate([
+      {
+        $match: {
+          _id: { $ne: currentProduct._id },
+        },
+      },
+
+      {
+        $addFields: {
+          titleMatchScore: {
+            $size: {
+              $setIntersection: [{ $split: ["$name", " "] }, keywords],
+            },
+          },
+
+          categoryScore: {
+            $cond: [{ $eq: ["$category", currentProduct.category] }, 5, 0],
+          },
+
+          brandScore: {
+            $cond: [{ $eq: ["$brand", currentProduct.brand] }, 2, 0],
+          },
+        },
+      },
+
+      {
+        $addFields: {
+          score: {
+            $add: [
+              "$titleMatchScore",
+              "$categoryScore",
+              "$brandScore",
+              { $divide: ["$popularityScore", 100] },
+            ],
+          },
+        },
+      },
+
+      {
+        $sort: { score: -1 },
+      },
+
+      {
+        $limit: 10,
+      },
+    ]);
 
     res.json(recommendations);
-
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Server error" });
   }
 });

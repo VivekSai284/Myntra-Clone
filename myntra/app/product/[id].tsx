@@ -79,7 +79,7 @@ export default function ProductDetails() {
           `https://myntra-clone-j4a9.onrender.com/product/recommend/${id}`,
         );
 
-        console.log("RECOMMENDATIONS:", res.data);  // 👈 ADD THIS
+        console.log("RECOMMENDATIONS:", res.data); // 👈 ADD THIS
         setRecommendations(res.data);
       } catch (error) {
         console.log("Recommendation error", error);
@@ -283,32 +283,50 @@ export default function ProductDetails() {
               <TouchableOpacity
                 key={item._id}
                 onPress={() => router.push(`/product/${item._id}`)}
-                style={{ marginRight: 15 }}
+                style={{
+                  marginRight: 15,
+                  width: 140,
+                }}
               >
                 <Image
                   source={{ uri: item.images[0] }}
                   style={{
-                    width: 130,
-                    height: 160,
+                    width: 140,
+                    height: 170,
                     borderRadius: 10,
-                    marginBottom: 5,
+                    marginBottom: 6,
                   }}
                 />
-
+                {/* Product Title */}
                 <Text
                   style={{
-                    color: theme.colors.text,
                     fontSize: 14,
-                    fontWeight: "500",
+                    fontWeight: "600",
+                    color: theme.colors.text, // WHITE
                   }}
+                  numberOfLines={2}
+                >
+                  {item.name}
+                </Text>
+
+                {/* Brand */}
+                <Text
+                  style={{
+                    fontSize: 12,
+                    color: theme.colors.subText, // GRAY
+                    marginTop: 4,
+                  }}
+                  numberOfLines={1}
                 >
                   {item.brand}
                 </Text>
 
+                {/* Price */}
                 <Text
                   style={{
                     color: theme.colors.primary,
                     fontWeight: "bold",
+                    marginTop: 4,
                   }}
                 >
                   ₹{item.price}
