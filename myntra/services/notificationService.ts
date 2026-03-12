@@ -29,7 +29,7 @@ export async function registerForPushNotifications(userId: string) {
   console.log("Expo Push Token:", token);
 
   // 🔥 Send token to backend
-  await axios.post("http://10.125.247.12/api/notifications/register", {
+  await axios.post("https://myntra-clone-j4a9.onrender.com/api/notifications/register", {
     userId,
     token,
     platform: "android",
