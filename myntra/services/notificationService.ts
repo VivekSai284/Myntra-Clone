@@ -1,8 +1,9 @@
 import * as Notifications from "expo-notifications";
 import * as Device from "expo-device";
 import { Platform } from "react-native";
+import axios from "axios";
 
-export async function registerForPushNotificationsAsync() {
+export async function registerForPushNotificationsAsync(userId: string) {
   let token;
 
   if (Device.isDevice) {
@@ -24,6 +25,14 @@ export async function registerForPushNotificationsAsync() {
     token = (await Notifications.getExpoPushTokenAsync()).data;
 
     console.log("Expo Push Token:", token);
+
+    // SEND TOKEN TO BACKEND
+    await axios.post("https://myntra-clone-j4a9.onrender.com/api/notifications/register", {
+      userId: userId,
+      token: token,
+      platform: Platform.OS
+    });
+
   } else {
     alert("Must use physical device for Push Notifications");
   }
