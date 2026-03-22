@@ -15,6 +15,7 @@
           "backgroundColor": "#ffffff"
         }
       ],
+      ["expo-notifications"],
       "expo-secure-store"
     ],
     "icon": "./assets/images/myntra.png",
@@ -31,6 +32,7 @@
       },
       "package": "com.viveksai.myntra",
       "googleServicesFile": "./google-services.json"
+
     },
     "web": {
       "bundler": "metro",

@@ -25,10 +25,10 @@ export const saveUserData = async (
 export const getUserData = async () => {
   try {
     const data = await AsyncStorage.getItem(USER_KEY);
-    return data ? JSON.parse(data) : {};
+    return data ? JSON.parse(data) : null;
   } catch (error) {
     console.log("Error getting user:", error);
-    return {};
+    return null;
   }
 };
 

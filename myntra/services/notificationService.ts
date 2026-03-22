@@ -4,9 +4,14 @@ import { Platform } from "react-native";
 import axios from "axios";
 
 export async function registerForPushNotifications(userId: string) {
-  let token;
+  try {
+    let token;
 
-  if (Device.isDevice) {
+    if (!Device.isDevice) {
+      alert("Must use physical device");
+      return;
+    }
+
     const { status: existingStatus } =
       await Notifications.getPermissionsAsync();
 
@@ -26,23 +31,26 @@ export async function registerForPushNotifications(userId: string) {
 
     console.log("Expo Push Token:", token);
 
-    // SEND TOKEN TO BACKEND
-    await axios.post("https://myntra-clone-j4a9.onrender.com/api/notifications/register", {
-      userId: userId,
-      token: token,
-      platform: Platform.OS
-    });
+    // ✅ SEND TOKEN
+    await axios.post(
+      "https://myntra-clone-j4a9.onrender.com/api/notifications/register",
+      {
+        userId,
+        token,
+        platform: Platform.OS,
+      }
+    );
 
-  } else {
-    alert("Must use physical device for Push Notifications");
+    // ✅ ANDROID CHANNEL
+    if (Platform.OS === "android") {
+      await Notifications.setNotificationChannelAsync("default", {
+        name: "default",
+        importance: Notifications.AndroidImportance.MAX,
+      });
+    }
+
+    return token;
+  } catch (err) {
+    console.log("Push registration error:", err);
   }
-
-  if (Platform.OS === "android") {
-    Notifications.setNotificationChannelAsync("default", {
-      name: "default",
-      importance: Notifications.AndroidImportance.MAX,
-    });
-  }
-
-  return token;
 }

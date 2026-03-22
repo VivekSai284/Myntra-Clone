@@ -11,6 +11,7 @@ import { useTheme } from "@/hooks/useTheme";
 import "@/utils/axiosConfig";
 import * as Notifications from "expo-notifications";
 import { registerForPushNotifications } from "../services/notificationService";
+import { useAuth } from "@/context/AuthContext"; // ADD THIS
 
 SplashScreen.preventAutoHideAsync();
 
@@ -47,14 +48,33 @@ export default function RootLayout() {
     if (loaded) SplashScreen.hideAsync();
   }, [loaded]);
 
-  useEffect(() => {
-    async function getToken() {
-      const token = await registerForPushNotifications();
-      console.log("Push Token:", token);
-    }
+  function AppContent() {
+    const { user, initialized } = useAuth();
 
-    getToken();
-  }, []);
+    useEffect(() => {
+      if (!initialized) {
+        console.log("Auth initializing...");
+        return;
+      }
+
+      if (!user?._id) {
+        console.log("No user after initialization");
+        return;
+      }
+
+      async function initPush() {
+        console.log("User available ✅", user._id);
+
+        const token = await registerForPushNotifications(user._id);
+
+        console.log("TOKEN:", token);
+      }
+
+      initPush();
+    }, [initialized, user?._id]);
+
+    return <RootNavigator />;
+  }
 
   useEffect(() => {
     // When notification is received while app is open
@@ -89,7 +109,7 @@ export default function RootLayout() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <RootNavigator />
+        <AppContent />
       </AuthProvider>
     </ThemeProvider>
   );

@@ -44,4 +44,27 @@ mongoose
   .catch((err) => console.log(err));
 
 const PORT = process.env.PORT;
+const { Expo } = require("expo-server-sdk");
+const expo = new Expo();
+
+// 🔥 TEST PUSH NOTIFICATION ROUTE
+app.get("/send-test", async (req, res) => {
+  try {
+    const token = "PASTE_YOUR_TOKEN_HERE"; // 👈 replace this
+
+    const message = {
+      to: token,
+      sound: "default",
+      title: "Myntra 🔥",
+      body: "Push working bro!",
+    };
+
+    await expo.sendPushNotificationsAsync([message]);
+
+    res.send("✅ Notification sent!");
+  } catch (err) {
+    console.log("Push error:", err);
+    res.status(500).send("❌ Error sending notification");
+  }
+});
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));

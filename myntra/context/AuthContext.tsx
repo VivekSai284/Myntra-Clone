@@ -6,6 +6,7 @@ import axios from "axios";
 type AuthContextType = {
   isAuthenticated: boolean;
   user: { _id: string; name: string; email: string } | null;
+  initialized: boolean;
   Signup: (fullName: string, email: string, password: string) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
@@ -21,13 +22,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     email: string;
   } | null>(null);
 
+  const [initialized, setInitialized] = useState(true);
   useEffect(() => {
     (async () => {
       const data = await getUserData();
-      if (data._id && data.name && data.email) {
+      console.log("STORAGE DATA:", data); 
+      if (data && data._id && data.name && data.email) {
         setUser({ _id: data._id, name: data.name, email: data.email });
         setIsAuthenticated(true);
       }
+      setInitialized(true);
     })();
   }, []);
 
@@ -90,7 +94,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, user, Signup, login, logout }}
+      value={{ isAuthenticated, user, initialized, Signup, login, logout }}
     >
       {children}
     </AuthContext.Provider>
