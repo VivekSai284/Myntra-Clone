@@ -10,7 +10,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { useTheme } from "@/hooks/useTheme";
 import "@/utils/axiosConfig";
 import * as Notifications from "expo-notifications";
-import { registerForPushNotificationsAsync } from "../services/notificationService";
+import { registerForPushNotifications } from "../services/notificationService";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -49,7 +49,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     async function getToken() {
-      const token = await registerForPushNotificationsAsync();
+      const token = await registerForPushNotifications();
       console.log("Push Token:", token);
     }
 

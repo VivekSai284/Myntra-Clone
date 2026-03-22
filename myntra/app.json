@@ -30,7 +30,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.viveksai.myntra",
-      "googleServicesFile": "./android/app/google-services.json"
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "bundler": "metro",
